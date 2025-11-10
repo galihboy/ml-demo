@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-Nearest Neighbors Demo - ML Demo</title>
+    <link rel="stylesheet" href="../assets/css/unified-demo.css">
+    <link rel="stylesheet" href="../assets/css/knn-specific.css">
+</head>
+<body>
+    <div class="demo-wrapper">
+        <div class="demo-header">
+            <a href="../index.html" class="back-link">← Kembali</a>
+            <h1>🎯 K-Nearest Neighbors (KNN)</h1>
+            <p>Visualisasi algoritma KNN untuk klasifikasi dengan 2 fitur</p>
+        </div>
+
+        <div class="description-box">
+            <h4>📘 Tentang Demo Ini</h4>
+            <p>
+                Demo ini menggunakan <strong>visualisasi 2 dimensi (2 fitur)</strong> untuk memudahkan pemahaman konsep KNN. 
+                Koordinat X dan Y pada canvas merepresentasikan <strong>2 fitur</strong> dari data.
+            </p>
+            <p style="margin-top: 10px;">
+                <strong>Contoh Analogi Data Riil:</strong>
+            </p>
+            <ul>
+                <li><strong>Fitur X:</strong> Tinggi Badan (cm) | <strong>Fitur Y:</strong> Berat Badan (kg)</li>
+                <li><strong>Fitur X:</strong> Suhu Tubuh (°C) | <strong>Fitur Y:</strong> Tekanan Darah (mmHg)</li>
+                <li><strong>Fitur X:</strong> Nilai Matematika | <strong>Fitur Y:</strong> Nilai Fisika</li>
+            </ul>
+            <p style="margin-top: 10px;">
+                Dalam aplikasi nyata, KNN dapat bekerja dengan <strong>banyak fitur</strong> (3, 4, 5, atau lebih), 
+                namun visualisasi 2D dipilih agar mudah dipahami secara visual.
+            </p>
+        </div>
+
+        <div class="demo-content">
+            <div class="sidebar">
+                <div class="control-group">
+                    <h3>⚙️ Pengaturan</h3>
+                    
+                    <div class="control-item">
+                        <label>Nilai K (Jumlah Tetangga)</label>
+                        <input type="range" id="kValue" min="1" max="15" value="3">
+                        <span class="value-display" id="kDisplay">3</span>
+                    </div>
+
+                    <div class="mode-selector">
+                        <button class="mode-btn active" onclick="setMode('class0')">➕ Kelas Merah</button>
+                        <button class="mode-btn" onclick="setMode('class1')">➕ Kelas Biru</button>
+                    </div>
+
+                    <button class="btn-primary" onclick="setMode('test')" id="testModeBtn">
+                        🎯 Prediksi (Klik di Canvas)
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎮 Kontrol</h3>
+                    <button class="btn-primary" onclick="generateRandomData()">🎲 Data Acak</button>
+                    <button class="btn-secondary" onclick="clearCanvas()">🗑️ Hapus Semua</button>
+                    <button class="btn-danger" onclick="resetDemo()">🔄 Reset Demo</button>
+                </div>
+
+                <div class="info-box">
+                    <h4>📖 Cara Pakai:</h4>
+                    <ol>
+                        <li><strong>Tambah Data:</strong> Pilih kelas (Merah/Biru), lalu klik di canvas</li>
+                        <li><strong>Prediksi:</strong> Klik tombol "Prediksi", lalu klik di canvas untuk melihat hasil KNN</li>
+                        <li><strong>Eksperimen:</strong> Atur nilai K untuk melihat pengaruhnya</li>
+                        <li><strong>Reset:</strong> Gunakan "Data Acak" atau "Hapus Semua"</li>
+                    </ol>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ff6b6b;"></div>
+                        <span>Kelas 0</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #4ecdc4;"></div>
+                        <span>Kelas 1</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #ffd93d;"></div>
+                        <span>Uji</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <canvas id="canvas" width="800" height="600"></canvas>
+                
+                <div id="resultBox" class="result-box">
+                    <h4>📊 Hasil Prediksi</h4>
+                    <div class="result-details">
+                        <p><strong>Titik Uji:</strong> <span id="testPoint"></span></p>
+                        <p><strong>Prediksi:</strong> <span id="prediction"></span></p>
+                        <p><strong>K Tetangga Terdekat:</strong></p>
+                        <ul id="neighborList" class="neighbor-list"></ul>
+                        
+                        <div class="toggle-calc">
+                            <input type="checkbox" id="showCalc" onchange="toggleCalculation()">
+                            <label for="showCalc">📐 Tampilkan Detail Perhitungan</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="calculationBox" class="calculation-box">
+                    <h4>📐 Detail Perhitungan Step-by-Step</h4>
+                    <div id="calculationSteps"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
+            <p class="institution">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
+            <div class="github-links">
+                <a href="https://github.com/galihboy" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                    </svg>
+                    @galihboy
+                </a>
+                <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                    </svg>
+                    @Galih-Hermawan-Unikom
+                </a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                © 2025 | Demo Pembelajaran Mesin
+            </p>
+        </div>
+    </div>
+
+    <script src="knn.js"></script>
+</body>
+</html>
