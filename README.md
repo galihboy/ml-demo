@@ -8,6 +8,7 @@ Repository ini berisi kumpulan demo dan simulasi interaktif untuk algoritma dan 
 - **Linear Regression** - Visualisasi regresi linear dengan gradient descent
 - **Error Metrics** - Playground interaktif untuk memahami MAE, MSE, RMSE, dan MAPE
 - **K-Nearest Neighbors (KNN)** - Demo KNN interaktif untuk klasifikasi dengan visualisasi 2D
+- **Support Vector Machine (SVM)** - Visualisasi SVM dengan berbagai kernel (Linear, Polynomial, RBF)
 
 ## 🚀 Cara Menggunakan
 

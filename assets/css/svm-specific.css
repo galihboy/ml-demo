@@ -1,0 +1,170 @@
+/* SVM Specific Styles */
+
+/* Stats Panel */
+.svm-stats {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.svm-stats h3 {
+    color: #667eea;
+    font-size: 1em;
+    margin: 0 0 10px 0;
+    border-bottom: 2px solid #667eea;
+    padding-bottom: 5px;
+}
+
+.svm-stats p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+/* Calculation Panel */
+.svm-calc {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+}
+
+.svm-calc h3 {
+    color: #60a5fa;
+    font-size: 0.9rem;
+    margin: 0 0 10px 0;
+    border-bottom: 1px solid #475569;
+    padding-bottom: 5px;
+}
+
+.svm-calc #calcFormula {
+    margin-bottom: 10px;
+    padding: 8px;
+    background: #0f172a;
+    border-radius: 4px;
+}
+
+.svm-calc p {
+    margin: 5px 0;
+}
+
+/* Info Box */
+.svm-info {
+    background: #e8f4f8;
+    border-left: 4px solid #4ecdc4;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.svm-info h4 {
+    color: #4ecdc4;
+    font-size: 0.9rem;
+    margin: 0 0 10px 0;
+}
+
+.svm-info ul {
+    padding-left: 20px;
+    margin: 0;
+    font-size: 0.8rem;
+    line-height: 1.6;
+}
+
+.svm-info li {
+    margin-bottom: 5px;
+}
+
+/* Legend */
+.svm-legend {
+    display: flex;
+    gap: 15px;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.svm-legend .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.svm-legend .blue {
+    background-color: #3b82f6;
+}
+
+.svm-legend .red {
+    background-color: #ef4444;
+}
+
+/* Instructions Overlay */
+.svm-instructions {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    z-index: 10;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Canvas Container */
+.main-area {
+    position: relative;
+    background: #e2e8f0;
+}
+
+.main-area canvas {
+    background: white;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    cursor: crosshair;
+}
+
+/* Select Dropdown */
+.control-item select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 2px solid #e0e0e0;
+    font-size: 0.9rem;
+    background: white;
+    cursor: pointer;
+}
+
+.control-item select:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Button Overrides for SVM */
+.control-group button {
+    margin: 3px 0;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .svm-legend {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .svm-instructions {
+        font-size: 0.8rem;
+        padding: 8px 16px;
+    }
+}
