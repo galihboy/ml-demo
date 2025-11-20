@@ -1,8 +1,45 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const width = canvas.width;
-const height = canvas.height;
-const padding = 50;
+let padding = 50;
+
+// Make canvas responsive
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const maxWidth = Math.min(800, container.clientWidth - 40);
+    const maxHeight = Math.min(500, window.innerHeight - 300);
+    
+    // Maintain aspect ratio 8:5
+    const aspectRatio = 8/5;
+    let width = maxWidth;
+    let height = width / aspectRatio;
+    
+    if (height > maxHeight) {
+        height = maxHeight;
+        width = height * aspectRatio;
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    // Adjust padding for smaller screens
+    padding = Math.max(30, Math.min(50, width * 0.06));
+    
+    if (dataPoints.length > 0) {
+        draw();
+    }
+}
+
+// Resize on window resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizeCanvas, 250);
+});
+
+// Use getters for dynamic width/height
+function getWidth() { return canvas.width; }
+function getHeight() { return canvas.height; }
+function getPadding() { return padding; }
 
 let dataPoints = [];
 let slope = 0;
@@ -116,6 +153,10 @@ function calculateCost() {
 }
 
 function draw() {
+    const width = getWidth();
+    const height = getHeight();
+    const padding = getPadding();
+    
     clearCanvas(ctx, width, height);
     
     // Draw axes
@@ -152,4 +193,5 @@ function reset() {
 }
 
 // Initialize
+resizeCanvas();
 generateData();

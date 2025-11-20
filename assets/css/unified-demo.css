@@ -256,6 +256,14 @@ canvas {
     transform: translateY(-2px);
 }
 
+/* Canvas Responsive */
+canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    touch-action: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .demo-content {
@@ -271,5 +279,55 @@ canvas {
         position: static;
         display: inline-block;
         margin-bottom: 15px;
+    }
+    
+    /* Canvas */
+    .main-area canvas {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 60vh;
+    }
+    
+    /* Controls */
+    .control-item label {
+        font-size: 0.85rem;
+    }
+    
+    .value-display {
+        font-size: 0.8rem;
+        padding: 4px 12px;
+    }
+    
+    .control-group button {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+}
+
+/* Extra Small Devices */
+@media (max-width: 480px) {
+    .main-area canvas {
+        max-height: 50vh;
+    }
+    
+    .control-item label {
+        font-size: 0.8rem;
+    }
+    
+    .value-display {
+        font-size: 0.75rem;
+        padding: 3px 10px;
+    }
+    
+    .control-group button {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+}
+
+/* Landscape Mode */
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-area canvas {
+        max-height: 70vh;
     }
 }

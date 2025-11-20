@@ -156,15 +156,133 @@
     margin: 3px 0;
 }
 
-/* Responsive */
+/* Canvas Responsive */
+.main-area canvas {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    touch-action: none;
+}
+
+/* Show/Hide based on device */
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: inline;
+}
+
+/* Mobile Optimizations */
 @media (max-width: 768px) {
+    /* Show/Hide Instructions */
+    .mobile-only {
+        display: inline;
+    }
+    
+    .desktop-only {
+        display: none;
+    }
+    
+    /* Legend */
     .svm-legend {
         flex-direction: column;
         gap: 8px;
+        font-size: 0.8rem;
+    }
+    
+    /* Instructions */
+    .svm-instructions {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        top: 10px;
+        max-width: 90%;
+        text-align: center;
+    }
+    
+    /* Canvas */
+    .main-area {
+        padding: 10px;
+    }
+    
+    .main-area canvas {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 70vh;
+        object-fit: contain;
+    }
+    
+    /* Stats & Calc Panels - Compact */
+    .svm-stats,
+    .svm-calc {
+        padding: 10px;
+        font-size: 0.8rem;
+    }
+    
+    .svm-stats h3,
+    .svm-calc h3 {
+        font-size: 0.85rem;
+    }
+    
+    /* Info Box - Collapsible on mobile */
+    .svm-info {
+        padding: 10px;
+    }
+    
+    .svm-info h4 {
+        font-size: 0.85rem;
+    }
+    
+    .svm-info ul {
+        font-size: 0.75rem;
+        padding-left: 15px;
+    }
+    
+    /* Buttons - Stack vertically */
+    .control-group button {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+}
+
+/* Extra Small Devices (phones in portrait) */
+@media (max-width: 480px) {
+    .svm-instructions {
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        border-radius: 15px;
+    }
+    
+    .main-area canvas {
+        max-height: 60vh;
+    }
+    
+    /* Compact controls */
+    .control-item label {
+        font-size: 0.8rem;
+    }
+    
+    .value-display {
+        font-size: 0.75rem;
+        padding: 3px 10px;
+    }
+    
+    /* Smaller buttons */
+    .control-group button {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+}
+
+/* Landscape Mode on Mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-area canvas {
+        max-height: 80vh;
     }
     
     .svm-instructions {
-        font-size: 0.8rem;
-        padding: 8px 16px;
+        top: 5px;
+        font-size: 0.7rem;
+        padding: 4px 10px;
     }
 }

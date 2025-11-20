@@ -6,6 +6,37 @@ let k = 3;
 let dataPoints = [];
 let testPoint = null;
 
+// Make canvas responsive
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const maxWidth = Math.min(800, container.clientWidth - 40);
+    const maxHeight = Math.min(600, window.innerHeight - 250);
+    
+    // Maintain aspect ratio
+    const aspectRatio = 4/3; // 800/600
+    let width = maxWidth;
+    let height = width / aspectRatio;
+    
+    if (height > maxHeight) {
+        height = maxHeight;
+        width = height * aspectRatio;
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    
+    if (dataPoints.length > 0 || testPoint) {
+        draw();
+    }
+}
+
+// Resize on window resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizeCanvas, 250);
+});
+
 // Update K value
 document.getElementById('kValue').addEventListener('input', function() {
     k = parseInt(this.value);
@@ -39,20 +70,27 @@ function setMode(mode) {
 
 function generateRandomData() {
     dataPoints = [];
+    const w = canvas.width;
+    const h = canvas.height;
+    
+    // Kelas 0 (Merah) - cluster di kiri bawah
     for (let i = 0; i < 5; i++) {
         dataPoints.push({
-            x: 150 + Math.random() * 150,
-            y: 400 + Math.random() * 150,
+            x: w * 0.2 + Math.random() * w * 0.2,  // 20-40% dari width
+            y: h * 0.65 + Math.random() * h * 0.25, // 65-90% dari height
             class: 0
         });
     }
+    
+    // Kelas 1 (Biru) - cluster di kanan atas
     for (let i = 0; i < 5; i++) {
         dataPoints.push({
-            x: 500 + Math.random() * 150,
-            y: 100 + Math.random() * 150,
+            x: w * 0.6 + Math.random() * w * 0.2,  // 60-80% dari width
+            y: h * 0.1 + Math.random() * h * 0.25, // 10-35% dari height
             class: 1
         });
     }
+    
     testPoint = null;
     document.getElementById('resultBox').classList.remove('show');
     draw();
@@ -74,10 +112,20 @@ function resetDemo() {
     setMode('class0');
 }
 
-canvas.addEventListener('click', function(e) {
+// Handle both mouse and touch events
+function handlePointerEvent(e) {
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    let x, y;
+    
+    if (e.touches) {
+        // Touch event
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+    } else {
+        // Mouse event
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+    }
 
     if (currentMode === 'test') {
         testPoint = {x, y};
@@ -87,6 +135,12 @@ canvas.addEventListener('click', function(e) {
         dataPoints.push({x, y, class: classValue});
         draw();
     }
+}
+
+canvas.addEventListener('click', handlePointerEvent);
+canvas.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    handlePointerEvent(e);
 });
 
 function distance(p1, p2) {
@@ -409,4 +463,6 @@ function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
     ctx.fill();
 }
 
+// Initialize
 generateRandomData();
+resizeCanvas();

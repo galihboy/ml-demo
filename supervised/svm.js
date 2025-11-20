@@ -5,8 +5,6 @@
 // --- Configuration & State ---
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const width = canvas.width;
-const height = canvas.height;
 
 let points = []; // {x, y, label} normalized to [-1, 1]
 let alphas = []; // Dual variables
@@ -23,6 +21,13 @@ let C = 1.0;
 let gamma = 0.5;
 let degree = 2;
 let learningRate = 0.01;
+
+// UI Elements - declare early
+const btnTrain = document.getElementById('btnTrain');
+const btnStop = document.getElementById('btnStop');
+const btnResetTrain = document.getElementById('btnResetTrain');
+const btnClear = document.getElementById('btnClear');
+const btnRandom = document.getElementById('btnRandom');
 
 // --- Math Helpers ---
 function dot(v1, v2) {
@@ -146,6 +151,9 @@ const gridResX = 60;
 const gridResY = 60;
 
 function draw() {
+    const width = getWidth();
+    const height = getHeight();
+    
     // Clear
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, width, height);
@@ -197,6 +205,8 @@ function draw() {
 }
 
 function drawBackgroundTint(grid) {
+    const width = getWidth();
+    const height = getHeight();
     const cellW = width / gridResX;
     const cellH = height / gridResY;
 
@@ -212,6 +222,9 @@ function drawBackgroundTint(grid) {
 }
 
 function drawContour(grid, threshold, color, lineWidth, dashed = false) {
+    const width = getWidth();
+    const height = getHeight();
+    
     ctx.beginPath();
     ctx.strokeStyle = color;
     ctx.lineWidth = lineWidth;
@@ -277,26 +290,80 @@ function loop() {
 }
 
 // --- Interaction ---
-canvas.addEventListener('mousedown', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    let x = e.clientX - rect.left;
-    let y = e.clientY - rect.top;
+let longPressTimer = null;
+let isLongPress = false;
+
+function addPoint(x, y, label) {
+    const width = getWidth();
+    const height = getHeight();
     let nx = (x / width) * 2 - 1;
     let ny = -((y / height) * 2 - 1);
-    let label = (e.button === 2 || e.shiftKey) ? -1 : 1;
     points.push({ x: nx, y: ny, label: label });
     alphas.push(0);
     draw();
+}
+
+function handlePointerDown(e) {
+    const rect = canvas.getBoundingClientRect();
+    let x, y;
+    
+    if (e.touches) {
+        // Touch event
+        x = e.touches[0].clientX - rect.left;
+        y = e.touches[0].clientY - rect.top;
+        
+        // Long press for class -1 on mobile
+        isLongPress = false;
+        longPressTimer = setTimeout(() => {
+            isLongPress = true;
+            addPoint(x, y, -1);
+        }, 500);
+    } else {
+        // Mouse event
+        x = e.clientX - rect.left;
+        y = e.clientY - rect.top;
+        let label = (e.button === 2 || e.shiftKey) ? -1 : 1;
+        addPoint(x, y, label);
+    }
+}
+
+function handlePointerUp(e) {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+    }
+    
+    if (e.touches && !isLongPress) {
+        // Short tap - add class +1
+        const rect = canvas.getBoundingClientRect();
+        const x = e.changedTouches[0].clientX - rect.left;
+        const y = e.changedTouches[0].clientY - rect.top;
+        addPoint(x, y, 1);
+    }
+}
+
+function handlePointerCancel(e) {
+    if (longPressTimer) {
+        clearTimeout(longPressTimer);
+    }
+}
+
+canvas.addEventListener('mousedown', handlePointerDown);
+canvas.addEventListener('touchstart', (e) => {
+    e.preventDefault();
+    handlePointerDown(e);
+});
+canvas.addEventListener('touchend', (e) => {
+    e.preventDefault();
+    handlePointerUp(e);
+});
+canvas.addEventListener('touchcancel', (e) => {
+    e.preventDefault();
+    handlePointerCancel(e);
 });
 
 canvas.addEventListener('contextmenu', event => event.preventDefault());
 
-const btnTrain = document.getElementById('btnTrain');
-const btnStop = document.getElementById('btnStop');
-const btnResetTrain = document.getElementById('btnResetTrain');
-const btnClear = document.getElementById('btnClear');
-const btnRandom = document.getElementById('btnRandom');
-
+// Button event listeners
 btnTrain.addEventListener('click', () => {
     isTraining = true;
     consecutiveStableSteps = 0;
@@ -393,11 +460,40 @@ document.getElementById('paramDegree').addEventListener('input', (e) => {
     document.getElementById('valDegree').innerText = degree;
 });
 
+// Use getters for dynamic width/height
+function getWidth() { return canvas.width; }
+function getHeight() { return canvas.height; }
+
+// Make canvas responsive
+function resizeCanvas() {
+    const container = canvas.parentElement;
+    const maxWidth = Math.min(700, container.clientWidth - 40);
+    const maxHeight = Math.min(700, window.innerHeight - 200);
+    const size = Math.min(maxWidth, maxHeight);
+    
+    canvas.width = size;
+    canvas.height = size;
+    
+    if (points.length > 0) {
+        draw();
+    }
+}
+
+// Resize on window resize
+let resizeTimeout;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(resizeCanvas, 250);
+});
+
 // Init
 points.push({ x: -0.5, y: -0.5, label: -1 });
 points.push({ x: -0.2, y: -0.3, label: -1 });
 points.push({ x: 0.5, y: 0.5, label: 1 });
 points.push({ x: 0.3, y: 0.6, label: 1 });
 alphas = [0, 0, 0, 0];
+
+// Initial resize
+resizeCanvas();
 
 loop();

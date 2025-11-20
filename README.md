@@ -39,7 +39,7 @@ ml-demo/
 ## 👨‍💻 Pembuat
 
 **Galih Hermawan**
-- 🌐 Website: [galih.eu](https://galih.eu)
+- 🌐 Demo: [galih.eu](https://galih.eu/ml-demo/index.html)
 - 💼 GitHub Personal: [@galihboy](https://github.com/galihboy)
 - 🎓 GitHub Akademik: [@Galih-Hermawan-Unikom](https://github.com/Galih-Hermawan-Unikom)
 - 🏫 Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)

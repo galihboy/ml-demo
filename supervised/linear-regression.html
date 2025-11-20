@@ -2,7 +2,9 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Linear Regression Demo - ML Demo</title>
     <link rel="stylesheet" href="../assets/css/unified-demo.css">
 </head>
@@ -54,7 +56,7 @@
             </div>
 
             <div class="main-area">
-                <canvas id="canvas" width="800" height="500"></canvas>
+                <canvas id="canvas" width="800" height="500" touch-action="none"></canvas>
                 <div style="margin-top: 1.5rem; padding: 15px; background: #f8f9fa; border-radius: 10px;">
                     <p><strong>Iterasi:</strong> <span id="iteration">0</span> / <span id="maxIterDisplay">1000</span></p>
                     <p><strong>Cost:</strong> <span id="cost">0</span></p>

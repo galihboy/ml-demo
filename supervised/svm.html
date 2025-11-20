@@ -2,12 +2,13 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>SVM Demo - ML Demo</title>
     <link rel="stylesheet" href="../assets/css/unified-demo.css">
     <link rel="stylesheet" href="../assets/css/svm-specific.css">
     <!-- MathJax for rendering formulas -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
 <body>
@@ -91,9 +92,10 @@
 
             <div class="main-area">
                 <div class="svm-instructions">
-                    Klik untuk tambah data. Shift+Klik untuk kelas Merah.
+                    <span class="desktop-only">Klik untuk tambah data. Shift+Klik untuk kelas Merah.</span>
+                    <span class="mobile-only">Tap untuk tambah data Biru. Tahan untuk Merah.</span>
                 </div>
-                <canvas id="canvas" width="700" height="700"></canvas>
+                <canvas id="canvas" width="700" height="700" touch-action="none"></canvas>
             </div>
         </div>
 
