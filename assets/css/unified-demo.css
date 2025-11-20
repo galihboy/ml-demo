@@ -268,11 +268,20 @@ canvas {
 @media (max-width: 768px) {
     .demo-content {
         grid-template-columns: 1fr;
+        display: flex;
+        flex-direction: column;
     }
     
     .sidebar {
         border-right: none;
-        border-bottom: 2px solid #e0e0e0;
+        border-top: 2px solid #e0e0e0;
+        order: 2;
+        padding: 15px;
+    }
+    
+    .main-area {
+        order: 1;
+        padding: 10px;
     }
     
     .back-link {

@@ -184,30 +184,52 @@
         display: none;
     }
     
+    /* Make canvas area larger on mobile */
+    .demo-content {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .sidebar {
+        order: 2; /* Move sidebar below canvas */
+        border-right: none;
+        border-top: 2px solid #e0e0e0;
+        padding: 15px;
+    }
+    
+    .main-area {
+        order: 1; /* Canvas on top */
+        padding: 10px;
+        min-height: 60vh;
+    }
+    
     /* Legend */
     .svm-legend {
-        flex-direction: column;
-        gap: 8px;
-        font-size: 0.8rem;
+        flex-direction: row;
+        gap: 10px;
+        font-size: 0.75rem;
+        padding: 8px;
+        flex-wrap: wrap;
+    }
+    
+    .svm-legend > div {
+        flex: 0 0 auto;
     }
     
     /* Instructions */
     .svm-instructions {
-        font-size: 0.75rem;
-        padding: 6px 12px;
-        top: 10px;
-        max-width: 90%;
+        font-size: 0.7rem;
+        padding: 5px 10px;
+        top: 5px;
+        max-width: 95%;
         text-align: center;
+        line-height: 1.3;
     }
     
-    /* Canvas */
-    .main-area {
-        padding: 10px;
-    }
-    
+    /* Canvas - Make it bigger */
     .main-area canvas {
         width: 100% !important;
         height: auto !important;
+        min-height: 50vh;
         max-height: 70vh;
         object-fit: contain;
     }
@@ -216,48 +238,42 @@
     .svm-stats,
     .svm-calc {
         padding: 10px;
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+        margin-top: 8px;
     }
     
     .svm-stats h3,
     .svm-calc h3 {
-        font-size: 0.85rem;
+        font-size: 0.8rem;
+        margin-bottom: 8px;
     }
     
-    /* Info Box - Collapsible on mobile */
-    .svm-info {
-        padding: 10px;
-    }
-    
-    .svm-info h4 {
-        font-size: 0.85rem;
-    }
-    
-    .svm-info ul {
-        font-size: 0.75rem;
-        padding-left: 15px;
-    }
-    
-    /* Buttons - Stack vertically */
-    .control-group button {
-        font-size: 0.85rem;
-        padding: 10px;
-    }
-}
-
-/* Extra Small Devices (phones in portrait) */
-@media (max-width: 480px) {
-    .svm-instructions {
+    .svm-calc #calcFormula {
+        padding: 6px;
         font-size: 0.7rem;
-        padding: 5px 10px;
-        border-radius: 15px;
     }
     
-    .main-area canvas {
-        max-height: 60vh;
+    /* Info Box - Hide on mobile to save space */
+    .svm-info {
+        display: none;
     }
     
-    /* Compact controls */
+    /* Control groups - more compact */
+    .control-group {
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+    
+    .control-group h3 {
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    /* Control items */
+    .control-item {
+        margin-bottom: 10px;
+    }
+    
     .control-item label {
         font-size: 0.8rem;
     }
@@ -267,22 +283,86 @@
         padding: 3px 10px;
     }
     
-    /* Smaller buttons */
+    /* Buttons - Larger for touch */
+    .control-group button {
+        font-size: 0.85rem;
+        padding: 12px;
+        margin: 4px 0;
+    }
+    
+    /* Select dropdown */
+    .control-item select {
+        font-size: 0.85rem;
+        padding: 10px;
+    }
+}
+
+/* Extra Small Devices (phones in portrait) */
+@media (max-width: 480px) {
+    .svm-instructions {
+        font-size: 0.65rem;
+        padding: 4px 8px;
+        border-radius: 12px;
+    }
+    
+    .main-area {
+        min-height: 55vh;
+    }
+    
+    .main-area canvas {
+        min-height: 45vh;
+        max-height: 65vh;
+    }
+    
+    /* Extra compact controls */
+    .control-group {
+        padding: 10px;
+    }
+    
+    .control-item label {
+        font-size: 0.75rem;
+    }
+    
+    .value-display {
+        font-size: 0.7rem;
+        padding: 2px 8px;
+    }
+    
+    /* Buttons */
     .control-group button {
         font-size: 0.8rem;
-        padding: 8px;
+        padding: 10px;
+    }
+    
+    .svm-legend {
+        font-size: 0.7rem;
+        padding: 6px;
     }
 }
 
 /* Landscape Mode on Mobile */
 @media (max-width: 768px) and (orientation: landscape) {
+    .main-area {
+        min-height: 75vh;
+    }
+    
     .main-area canvas {
-        max-height: 80vh;
+        min-height: 65vh;
+        max-height: 85vh;
     }
     
     .svm-instructions {
-        top: 5px;
-        font-size: 0.7rem;
-        padding: 4px 10px;
+        top: 3px;
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+    
+    .sidebar {
+        padding: 10px;
+    }
+    
+    .control-group {
+        padding: 8px;
+        margin-bottom: 8px;
     }
 }
