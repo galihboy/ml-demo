@@ -253,9 +253,26 @@
         font-size: 0.7rem;
     }
     
-    /* Info Box - Hide on mobile to save space */
+    /* Info Box - Compact on mobile */
     .svm-info {
-        display: none;
+        padding: 10px;
+        font-size: 0.75rem;
+        margin-top: 8px;
+    }
+    
+    .svm-info h4 {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+    
+    .svm-info ul {
+        font-size: 0.7rem;
+        line-height: 1.5;
+        padding-left: 15px;
+    }
+    
+    .svm-info li {
+        margin-bottom: 4px;
     }
     
     /* Control groups - more compact */
