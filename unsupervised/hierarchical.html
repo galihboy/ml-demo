@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Hierarchical Clustering Demo - ML Demo</title>
+    <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
+    <style>
+        /* Custom Styles for Hierarchical */
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85em;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 1px solid #333;
+        }
+
+        .point-noise {
+            background-color: #e74c3c;
+            /* Red */
+        }
+
+        .point-core {
+            background-color: #2ecc71;
+            /* Green */
+        }
+
+        .point-border {
+            background-color: #f1c40f;
+            /* Yellow */
+        }
+
+        .step-info {
+            background: linear-gradient(135deg, #009688 0%, #4CAF50 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .step-info h3 {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 8px;
+            color: white !important;
+        }
+
+        /* Dendrogram Canvas Styling */
+        .dendrogram-container {
+            margin-top: 20px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+        }
+
+        .dendrogram-header {
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+
+        /* ... reused styles ... */
+        .calculation-panel {
+            margin-top: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .calc-header {
+            background: #f1f5f9;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .calc-content {
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            background: #fafafa;
+        }
+
+        .calc-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+
+        .calc-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Toggle Switch */
+        /* ... toggle switch styles can be reused from css/inline ... */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed #ddd;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: #009688;
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-wrapper">
+        <div class="demo-header">
+            <a href="../index.html" class="back-link">← Kembali</a>
+            <h1>Hierarchical Clustering</h1>
+            <p>Visualisasi Agglomerative Clustering & Dendrogram</p>
+        </div>
+
+        <div class="demo-content">
+            <div class="sidebar">
+                <!-- Info Steps -->
+                <div class="step-info">
+                    <h3 id="stepTitle" style="font-size: 1.1em;">Langkah 0: Persiapan</h3>
+                    <p id="stepDesc" style="font-size: 0.9em; line-height: 1.4;">Klik pada canvas untuk menambahkan
+                        titik data, lalu tekan "Mulai Clustering"</p>
+                </div>
+
+                <div class="control-group">
+                    <h3>⚙️ Pengaturan</h3>
+
+                    <div class="switch-container">
+                        <span style="font-weight: 600;">Mode Belajar</span>
+                        <label class="switch">
+                            <input type="checkbox" id="learningModeToggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div id="learningControls"
+                        style="display: none; margin-bottom: 15px; background: #eef2ff; padding: 10px; border-radius: 5px;">
+                        <div class="control-item" style="margin-bottom: 0;">
+                            <label>Max Titik Data: <span class="value-display" id="maxPointsDisplay">10</span></label>
+                            <input type="range" id="maxPointsSlider" min="3" max="20" value="10">
+                        </div>
+                    </div>
+
+                    <div class="control-item">
+                        <label>Metode Linkage:</label>
+                        <select id="linkageType"
+                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                            <option value="single">Single Linkage (Min)</option>
+                            <option value="complete">Complete Linkage (Max)</option>
+                            <option value="average">Average Linkage (Mean)</option>
+                            <option value="centroid">Centroid Linkage</option>
+                        </select>
+                    </div>
+
+                    <div class="control-item">
+                        <label>Target Cluster: <span class="value-display" id="kDisplay">1</span></label>
+                        <input type="range" id="kSlider" min="1" max="10" value="1">
+                    </div>
+
+                    <div class="control-item">
+                        <label>Pola Data:</label>
+                        <select id="dataType"
+                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                            <option value="blobs">Gugusan (Blobs)</option>
+                            <option value="moons">Bulan Sabit (Moons)</option>
+                            <option value="circles">Lingkaran (Circles)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-item">
+                        <label>Kecepatan Animasi: <span class="value-display" id="speedDisplay">500ms</span></label>
+                        <input type="range" id="speedSlider" min="100" max="2000" value="500">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎨 Legenda</h3>
+                    <div class="legend" id="legend"></div>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <!-- Main Scatter Plot -->
+                <canvas id="canvas" width="800" height="400" touch-action="none"></canvas>
+
+                <!-- Dendrogram Canvas -->
+                <div class="dendrogram-container">
+                    <div class="dendrogram-header">🌳 Dendrogram (Sejarah Penggabungan)</div>
+                    <canvas id="dendrogramCanvas" width="800" height="250"></canvas>
+                </div>
+
+                <!-- Primary Controls (Closest to Canvas) -->
+                <div class="control-group" style="margin-top: 15px; padding: 15px;">
+                    <h3 style="margin-bottom: 10px; font-size: 1em;">🎮 Kontrol Simulasi</h3>
+
+                    <!-- Row 1: Main Actions -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button class="btn-primary" id="btnStart" style="background: #009688; flex: 2;">▶️
+                            Mulai Clustering</button>
+                        <button class="btn-primary" id="btnStep" disabled style="flex: 3; font-size: 1.1em;">⏭️
+                            Step (Merge)</button>
+                        <button class="btn-warning" id="btnAuto" disabled style="flex: 3; font-size: 1.1em;">🔄
+                            Auto</button>
+                    </div>
+
+                    <!-- Row 2: Secondary / Data -->
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-secondary" id="btnRandom" style="flex: 1; font-size: 0.9em;">🎲
+                            Random</button>
+                        <button class="btn-secondary" id="btnClear" style="flex: 1; font-size: 0.9em;">🗑️
+                            Clear</button>
+                        <button class="btn-danger" id="btnReset" disabled style="flex: 1; font-size: 0.9em;">↩️
+                            Reset</button>
+                    </div>
+                </div>
+
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
+                        <span style="display: block; font-size: 0.9em; color: #666;">Jumlah Titik</span>
+                        <strong style="font-size: 1.4em; color: #333;" id="pointCount">0</strong>
+                    </div>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
+                        <span style="display: block; font-size: 0.9em; color: #666;">Cluster Saat Ini</span>
+                        <strong style="font-size: 1.4em; color: #009688;" id="clusterCount">0</strong>
+                    </div>
+                </div>
+
+                <!-- Calculation Details Panel -->
+                <div class="calculation-panel">
+                    <div class="calc-header">
+                        <span>🧮 Detail Jarak (Log)</span>
+                        <button id="toggleCalc"
+                            style="background: none; border: none; font-size: 1.2em; cursor: pointer; color: #666; width: auto; padding: 0;">⬇️</button>
+                    </div>
+                    <div class="calc-content" id="calcLog">
+                        <div style="color: #888; text-align: center; padding: 20px;">
+                            Belum ada perhitungan.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
+            <p class="institution">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
+            <div class="github-links">
+                <a href="https://github.com/galihboy" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @galihboy
+                </a>
+                <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @Galih-Hermawan-Unikom
+                </a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                © 2025 | Demo Pembelajaran Mesin
+            </p>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="hierarchical.js?v=2"></script>
+</body>
+
+</html>
