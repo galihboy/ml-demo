@@ -10,6 +10,16 @@ Repository ini berisi kumpulan demo dan simulasi interaktif untuk algoritma dan 
 - **K-Nearest Neighbors (KNN)** - Demo KNN interaktif untuk klasifikasi dengan visualisasi 2D
 - **Support Vector Machine (SVM)** - Visualisasi SVM dengan berbagai kernel (Linear, Polynomial, RBF)
 
+### Unsupervised Learning
+- **K-Means Clustering** - Visualisasi interaktif algoritma clustering step-by-step
+- **DBSCAN Clustering** - Visualisasi clustering berbasis kepadatan (Density-Based)
+- **Hierarchical Clustering** - Visualisasi Agglomerative Clustering & Dendrogram
+
+## 🎬 Preview
+
+### DBSCAN Clustering
+![DBSCAN Demo](assets/images/dbscan.gif)
+
 ## 🚀 Cara Menggunakan
 
 Setiap demo dapat dijalankan langsung di browser tanpa instalasi tambahan:
@@ -23,10 +33,12 @@ Setiap demo dapat dijalankan langsung di browser tanpa instalasi tambahan:
 ```
 ml-demo/
 ├── index.html              # Halaman utama dengan daftar semua demo
-├── assets/                 # Asset bersama (CSS, JS utilities)
+├── assets/                 # Asset bersama (CSS, JS, images)
 │   ├── css/
-│   └── js/
-└── supervised/             # Demo supervised learning
+│   ├── js/
+│   └── images/             # Gambar dan animasi untuk README
+├── supervised/             # Demo supervised learning
+└── unsupervised/           # Demo unsupervised learning
 ```
 
 ## 🛠️ Teknologi
