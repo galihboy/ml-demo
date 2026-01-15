@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ROC & AUC Curve Visualizer - ML Demo</title>
+    <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
+    <style>
+        .chart-container {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .chart-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 10px;
+            display: block;
+            font-size: 0.9rem;
+        }
+
+        canvas {
+            width: 100%;
+            height: auto;
+        }
+
+        .metrics-bar {
+            display: flex;
+            gap: 15px;
+            margin-top: 1rem;
+        }
+
+        .metric-mini-card {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .m-val {
+            font-weight: bold;
+            color: #333;
+            display: block;
+        }
+
+        .m-lab {
+            font-size: 0.7rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .auc-highlight {
+            font-size: 1.5rem;
+            color: #e91e63;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-wrapper">
+        <div class="demo-header">
+            <a href="../index.html" class="back-link">← Kembali</a>
+            <h1>ROC & AUC Curve</h1>
+            <p>Memahami performa klasifikasi di berbagai ambang batas (Threshold)</p>
+        </div>
+
+        <div class="demo-content">
+            <div class="sidebar">
+                <div class="control-group">
+                    <h3>⚙️ Pengaturan Data</h3>
+                    <div class="control-item">
+                        <label>Separasi Kelas: <span class="value-display" id="sepValue">2.0</span></label>
+                        <input type="range" id="sepSlider" min="0" max="5" step="0.1" value="2.0">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎯 Ambang Batas</h3>
+                    <div class="control-item">
+                        <label>Threshold: <span class="value-display" id="thresholdValue">0.5</span></label>
+                        <input type="range" id="thresholdSlider" min="-3" max="5" step="0.01" value="0.5">
+                    </div>
+                </div>
+
+                <div
+                    style="background: #fff0f6; border-left: 4px solid #e91e63; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    <h4 style="color: #c2185b; margin-bottom: 10px; font-size: 1em;">💡 Info</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                        <strong>TPR (True Positive Rate)</strong>: Sumbu Y pada kurva ROC. Seberapa banyak "Sakit" yang
+                        terdeteksi benar.
+                    </p>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                        <strong>FPR (False Positive Rate)</strong>: Sumbu X pada kurva ROC. Seberapa banyak "Sehat" yang
+                        dituduh "Sakit".
+                    </p>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="chart-container">
+                    <span class="chart-label">Distribusi Kelas</span>
+                    <canvas id="distCanvas" width="800" height="200" touch-action="none"></canvas>
+                </div>
+
+                <div class="chart-container">
+                    <span class="chart-label">Kurva ROC (TPR vs FPR)</span>
+                    <canvas id="rocCanvas" width="500" height="400"
+                        style="max-width: 500px; margin: 0 auto; display: block;" touch-action="none"></canvas>
+                </div>
+
+                <div class="metrics-bar">
+                    <div class="metric-mini-card">
+                        <span class="m-lab">TPR (Recall)</span>
+                        <span class="m-val" id="tprVal">0.00</span>
+                    </div>
+                    <div class="metric-mini-card">
+                        <span class="m-lab">FPR</span>
+                        <span class="m-val" id="fprVal">0.00</span>
+                    </div>
+                    <div class="metric-mini-card" style="flex: 1.5; background: #fff; border-color: #e91e63;">
+                        <span class="m-lab">Area Under Curve (AUC)</span>
+                        <span class="auc-highlight" id="aucVal">0.00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
+            <p class="institution">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
+            <div class="github-links">
+                <a href="https://github.com/galihboy" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @galihboy
+                </a>
+                <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @Galih-Hermawan-Unikom
+                </a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                © 2025 | Demo Pembelajaran Mesin
+            </p>
+        </div>
+    </div>
+
+    <script src="../assets/js/utils.js?v=2"></script>
+    <script src="roc-auc.js?v=2"></script>
+</body>
+
+</html>

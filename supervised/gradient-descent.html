@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Gradient Descent Demo - ML Demo</title>
+    <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
+    <style>
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .canvas-box {
+            position: relative;
+        }
+        
+        .canvas-box canvas {
+            width: 100%;
+            height: 300px;
+        }
+        
+        .formula-overlay {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            pointer-events: none;
+        }
+        
+        .formula-overlay span {
+            color: #ffd93d;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .stat-card.decay {
+            border-left-color: #764ba2;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .stat-value {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .stat-value.danger {
+            color: #dc3545;
+        }
+        
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            background: #e9ecef;
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .mode-option input {
+            display: none;
+        }
+        
+        .mode-option label {
+            display: block;
+            padding: 8px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #666;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .mode-option input:checked + label {
+            background: #667eea;
+            color: white;
+        }
+        
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+        
+        .buttons-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        
+        .buttons-row button {
+            margin: 0;
+        }
+        
+        @media (max-width: 768px) {
+            .canvas-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .canvas-box canvas {
+                height: 250px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-wrapper">
+        <div class="demo-header">
+            <a href="../index.html" class="back-link">← Kembali</a>
+            <h1>Gradient Descent</h1>
+            <p>Demo interaktif optimasi pada Loss Landscape</p>
+        </div>
+
+        <div class="demo-content">
+            <div class="sidebar">
+                <div class="control-group">
+                    <h3>📊 Loss Function</h3>
+                    <div class="control-item">
+                        <select id="func-select">
+                            <option value="quadratic">Quadratic (MSE): x²</option>
+                            <option value="absolute">Absolute (MAE): |x|</option>
+                            <option value="quartic">Quartic: 0.1x⁴</option>
+                            <option value="nonconvex">Non-Convex: x² + 5sin(2x)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>⚙️ Parameter</h3>
+                    
+                    <div class="control-item">
+                        <label>Learning Rate (η): <span class="value-display" id="lr-val">0.100</span></label>
+                        <input type="range" id="lr-range" min="0.001" max="1.1" step="0.001" value="0.10">
+                    </div>
+
+                    <div class="control-item">
+                        <label>Posisi Awal (x₀): <span class="value-display" id="start-val">-4.0</span></label>
+                        <input type="range" id="start-range" min="-5" max="5" step="0.1" value="-4.0">
+                    </div>
+                    
+                    <div class="control-item">
+                        <label>Kecepatan: <span class="value-display" id="speed-val">100ms</span></label>
+                        <input type="range" id="speed-range" min="20" max="500" step="10" value="100">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎮 Mode Eksekusi</h3>
+                    <div class="mode-selector">
+                        <div class="mode-option">
+                            <input type="radio" name="mode" id="mode-fixed" value="fixed" checked>
+                            <label for="mode-fixed">Manual</label>
+                        </div>
+                        <div class="mode-option">
+                            <input type="radio" name="mode" id="mode-adaptive" value="adaptive">
+                            <label for="mode-adaptive">Adaptif</label>
+                        </div>
+                    </div>
+                    
+                    <div class="control-item" id="iter-group">
+                        <label>Max Iterasi: <span class="value-display" id="max-iter-val">50</span></label>
+                        <input type="range" id="max-iter-range" min="10" max="200" step="5" value="50">
+                    </div>
+                    
+                    <div class="switch-container">
+                        <label style="font-weight: 600; color: #333;">Learning Rate Decay</label>
+                        <label class="switch">
+                            <input type="checkbox" id="decay-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎯 Kontrol</h3>
+                    <div class="buttons-row">
+                        <button class="btn-primary" id="start-btn">▶️ Start</button>
+                        <button class="btn-secondary" id="reset-btn">🔄 Reset</button>
+                    </div>
+                </div>
+
+                <div style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                    <h4 style="color: #2196F3; margin-bottom: 10px; font-size: 1em;">📖 Info</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                        <strong>Gradient Descent</strong> mencari minimum fungsi dengan bergerak berlawanan arah gradien.
+                    </p>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                        <strong>Learning Rate Decay:</strong> η = η₀ / (1 + 0.05 × iter)
+                    </p>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="canvas-grid">
+                    <div class="canvas-box">
+                        <div class="formula-overlay" id="formula-display">
+                            f(x) = x²<br>
+                            f'(x) = <span>2x</span>
+                        </div>
+                        <canvas id="canvas1"></canvas>
+                    </div>
+                    <div class="canvas-box">
+                        <div class="formula-overlay">
+                            <span>Loss Curve</span><br>
+                            f(x) vs Iterasi
+                        </div>
+                        <canvas id="canvas2"></canvas>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Iterasi</div>
+                        <div class="stat-value" id="iter-stat">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Current X</div>
+                        <div class="stat-value" id="x-stat">-4.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Loss f(x)</div>
+                        <div class="stat-value" id="y-stat">16.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Gradient</div>
+                        <div class="stat-value" id="grad-stat">0.00</div>
+                    </div>
+                    <div class="stat-card decay" id="eff-lr-card" style="display: none;">
+                        <div class="stat-label">Eff. Learning Rate</div>
+                        <div class="stat-value" id="eff-lr-stat">0.000</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
+            <p class="institution">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
+            <div class="github-links">
+                <a href="https://github.com/galihboy" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                    </svg>
+                    @galihboy
+                </a>
+                <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                    </svg>
+                    @Galih-Hermawan-Unikom
+                </a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                © 2025 | Demo Pembelajaran Mesin
+            </p>
+        </div>
+    </div>
+
+    <script src="../assets/js/utils.js?v=2"></script>
+    <script src="gradient-descent.js?v=2"></script>
+</body>
+</html>

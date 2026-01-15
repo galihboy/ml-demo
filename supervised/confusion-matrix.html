@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>Confusion Matrix Playground - ML Demo</title>
+    <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
+    <style>
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 1.5rem;
+        }
+
+        .metric-card {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border-top: 4px solid #667eea;
+        }
+
+        .metric-value {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .matrix-table th,
+        .matrix-table td {
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .matrix-table th {
+            background: #f8f9fa;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .cell-label {
+            display: block;
+            font-size: 0.7rem;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .cell-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .tp {
+            color: #28a745;
+            background: #e6ffed;
+        }
+
+        .tn {
+            color: #28a745;
+            background: #e6ffed;
+        }
+
+        .fp {
+            color: #d73a49;
+            background: #ffeef0;
+        }
+
+        .fn {
+            color: #d73a49;
+            background: #ffeef0;
+        }
+
+        .distribution-container {
+            position: relative;
+            background: white;
+            border-radius: 10px;
+            padding: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        #threshold-slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-wrapper">
+        <div class="demo-header">
+            <a href="../index.html" class="back-link">← Kembali</a>
+            <h1>Confusion Matrix Playground</h1>
+            <p>Visualisasi Threshold, Distribusi, dan Metrik Klasifikasi</p>
+        </div>
+
+        <div class="demo-content">
+            <div class="sidebar">
+                <div class="control-group">
+                    <h3>⚙️ Distribusi Data</h3>
+                    <div class="control-item">
+                        <label>Separasi (Mean Diff): <span class="value-display" id="separationValue">2.0</span></label>
+                        <input type="range" id="separation" min="0" max="5" step="0.1" value="2.0">
+                    </div>
+                    <div class="control-item">
+                        <label>Penyebaran (Std Dev): <span class="value-display" id="stdDevValue">1.0</span></label>
+                        <input type="range" id="stdDev" min="0.5" max="2.0" step="0.1" value="1.0">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎯 Klasifikasi</h3>
+                    <div class="control-item">
+                        <label>Ambang Batas (Threshold): <span class="value-display"
+                                id="thresholdValue">0.5</span></label>
+                        <input type="range" id="threshold" min="-3" max="5" step="0.01" value="0.5">
+                    </div>
+                </div>
+
+                <div
+                    style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    <h4 style="color: #2196F3; margin-bottom: 10px; font-size: 1em;">📖 Konsep</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                        Geser <strong>Threshold</strong> untuk melihat trade-off antara Precision (ketepatan) dan Recall
+                        (kepekaan).
+                    </p>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                        Kurva <strong>Biru</strong> adalah data Negatif, kurva <strong>Oranye</strong> adalah data
+                        Positif.
+                    </p>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="distribution-container">
+                    <canvas id="canvas" width="800" height="300" touch-action="none"></canvas>
+                </div>
+
+                <table class="matrix-table">
+                    <tr>
+                        <th rowspan="2" style="background: white; border: none;"></th>
+                        <th colspan="2">Prediksi</th>
+                    </tr>
+                    <tr>
+                        <th>Negatif (0)</th>
+                        <th>Positif (1)</th>
+                    </tr>
+                    <tr>
+                        <th>Aktual Negatif</th>
+                        <td class="tn"><span class="cell-label">True Negative (TN)</span><span class="cell-value"
+                                id="tnValue">0</span></td>
+                        <td class="fp"><span class="cell-label">False Positive (FP)</span><span class="cell-value"
+                                id="fpValue">0</span></td>
+                    </tr>
+                    <tr>
+                        <th>Aktual Positif</th>
+                        <td class="fn"><span class="cell-label">False Negative (FN)</span><span class="cell-value"
+                                id="fnValue">0</span></td>
+                        <td class="tp"><span class="cell-label">True Positive (TP)</span><span class="cell-value"
+                                id="tpValue">0</span></td>
+                    </tr>
+                </table>
+
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <span class="metric-label">Accuracy</span>
+                        <span class="metric-value" id="accValue">0%</span>
+                    </div>
+                    <div class="metric-card" style="border-top-color: #28a745;">
+                        <span class="metric-label">Precision</span>
+                        <span class="metric-value" id="precValue">0%</span>
+                    </div>
+                    <div class="metric-card" style="border-top-color: #ffc107;">
+                        <span class="metric-label">Recall (Sensitivity)</span>
+                        <span class="metric-value" id="recValue">0%</span>
+                    </div>
+                    <div class="metric-card" style="border-top-color: #e91e63;">
+                        <span class="metric-label">F1-Score</span>
+                        <span class="metric-value" id="f1Value">0%</span>
+                    </div>
+                </div>
+
+                <div class="control-group" style="margin-top: 2rem;">
+                    <h3>🔢 Langkah Perhitungan</h3>
+                    <div id="calculationSteps"
+                        style="font-family: 'serif'; line-height: 2; color: #444; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        Memuat perhitungan...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
+            <p class="institution">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
+            <div class="github-links">
+                <a href="https://github.com/galihboy" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @galihboy
+                </a>
+                <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @Galih-Hermawan-Unikom
+                </a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                © 2025 | Demo Pembelajaran Mesin
+            </p>
+        </div>
+    </div>
+
+    <script src="../assets/js/utils.js?v=2"></script>
+    <script src="confusion-matrix.js?v=2"></script>
+</body>
+
+</html>

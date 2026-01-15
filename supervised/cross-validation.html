@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>K-Fold Cross-Validation Visualizer - ML Demo</title>
+    <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
+    <style>
+        .fold-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 2rem;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .fold-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .fold-label {
+            width: 80px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .fold-bar {
+            display: flex;
+            flex: 1;
+            height: 35px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        .fold-block {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .train-set {
+            background: #667eea;
+        }
+
+        /* Blue */
+        .val-set {
+            background: #f1c40f;
+            color: #333;
+        }
+
+        /* Yellow */
+
+        .fold-active {
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            transform: scaleY(1.1);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 2rem;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #eee;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .highlight-text {
+            color: #667eea;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-wrapper">
+        <div class="demo-header">
+            <a href="../index.html" class="back-link">← Kembali</a>
+            <h1>K-Fold Cross-Validation</h1>
+            <p>Visualisasi proses pembagian data (Splitting) secara berulang</p>
+        </div>
+
+        <div class="demo-content">
+            <div class="sidebar">
+                <div class="control-group">
+                    <h3>⚙️ Pengaturan</h3>
+                    <div class="control-item">
+                        <label>Jumlah Fold (K): <span class="value-display" id="kValue">5</span></label>
+                        <input type="range" id="kSlider" min="2" max="10" step="1" value="5">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>🎮 Kontrol</h3>
+                    <button class="btn-primary" id="playBtn">▶️ Putar Animasi</button>
+                    <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
+                </div>
+
+                <div
+                    style="background: #e6ffed; border-left: 4px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    <h4 style="color: #28a745; margin-bottom: 10px; font-size: 1em;">📝 Penjelasan</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                        Kotak <span class="highlight-text" style="color: #667eea;">Biru</span> adalah data yang
+                        digunakan untuk <strong>Training</strong>.
+                    </p>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                        Kotak <span class="highlight-text" style="color: #f1c40f;">Kuning</span> adalah data yang
+                        digunakan untuk <strong>Validation</strong> (pengujian fold tersebut).
+                    </p>
+                </div>
+            </div>
+
+            <div class="main-area">
+                <div class="fold-container" id="foldContainer">
+                    <!-- Folds will be generated here -->
+                </div>
+
+                <div class="stats-grid" id="statsGrid">
+                    <!-- Mock accuracy stats will be here -->
+                </div>
+
+                <div
+                    style="margin-top: 2rem; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;">
+                    <p><strong>Rata-rata Akurasi (CV Score):</strong> <span id="avgAccuracy"
+                            style="font-size: 1.5rem; font-weight: bold; color: #28a745;">0.00%</span></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="demo-footer">
+            <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
+            <p class="institution">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
+            <div class="github-links">
+                <a href="https://github.com/galihboy" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @galihboy
+                </a>
+                <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
+                    </svg>
+                    @Galih-Hermawan-Unikom
+                </a>
+            </div>
+            <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                © 2025 | Demo Pembelajaran Mesin
+            </p>
+        </div>
+    </div>
+
+    <script src="cross-validation.js?v=2"></script>
+</body>
+
+</html>
