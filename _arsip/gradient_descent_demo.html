@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gradient Descent Interactive Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=JetBrains+Mono&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --accent-color: #38bdf8;
+            --accent-glow: rgba(56, 189, 248, 0.3);
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at top right, #1e293b, #0f172a);
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            background: var(--card-bg);
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-height: 98vh;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Custom scrollbar for sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(to right, var(--accent-color), #818cf8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .control-group {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 1.25rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .value-badge {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 6px;
+            background: #334155;
+            border-radius: 5px;
+            appearance: none;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px var(--accent-glow);
+            transition: transform 0.2s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .mode-selector {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .mode-option {
+            flex: 1;
+            text-align: center;
+        }
+
+        .mode-option input {
+            display: none;
+        }
+
+        .mode-option label {
+            display: block;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: var(--text-secondary);
+        }
+
+        .mode-option input:checked+label {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 600;
+        }
+
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-family: inherit;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1rem;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        button {
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: none;
+            font-family: inherit;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--accent-color);
+            color: #000;
+        }
+
+        /* Toggle Switch */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.5rem 0.25rem;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.1);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(22px);
+        }
+
+        .btn-primary:hover {
+            background: #7dd3fc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.02);
+            padding: 0.6rem;
+            border-radius: 12px;
+            text-align: left;
+            border-left: 3px solid var(--accent-color);
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.1rem;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        #eff-lr-card {
+            border-left-color: #f472b6;
+            /* Pink accent for decay */
+        }
+
+        .canvas-area {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            position: relative;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            height: 100%;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .formula-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        .formula-overlay span {
+            color: var(--accent-color);
+        }
+
+        @media (max-width: 900px) {
+            .container {
+                grid-template-columns: 1fr;
+                overflow-y: auto;
+                height: 95vh;
+            }
+
+            .sidebar {
+                order: 2;
+            }
+
+            .canvas-area {
+                height: 400px;
+                order: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container" id="app">
+        <div class="sidebar">
+            <header>
+                <h1>Gradient Descent</h1>
+                <p>Demo interaktif optimasi. Bandingkan perilaku fungsi loss berbeda.</p>
+            </header>
+
+            <div class="control-group">
+                <label class="control-label" for="func-select">
+                    <span>Loss Function f(x)</span>
+                </label>
+                <select id="func-select" aria-label="Select Loss Function">
+                    <option value="quadratic">Quadratic (MSE): x²</option>
+                    <option value="absolute">Absolute (MAE): |x|</option>
+                    <option value="quartic">Quartic: x⁴</option>
+                    <option value="nonconvex">Non-Convex: x² + 5sin(2x)</option>
+                </select>
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="lr-range">
+                    <span>Learning Rate (&eta;)</span>
+                    <span class="value-badge" id="lr-val">0.10</span>
+                </label>
+                <input type="range" id="lr-range" min="0.001" max="1.1" step="0.001" value="0.10">
+            </div>
+
+            <div class="control-group">
+                <label class="control-label" for="start-range">
+                    <span>Start Position (x₀)</span>
+                    <span class="value-badge" id="start-val">-4.0</span>
+                </label>
+                <input type="range" id="start-range" min="-5" max="5" step="0.1" value="-4.0">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Execution Mode</span>
+                </div>
+                <div class="mode-selector">
+                    <div class="mode-option">
+                        <input type="radio" name="mode" id="mode-fixed" value="fixed" checked>
+                        <label for="mode-fixed">Manual</label>
+                    </div>
+                    <div class="mode-option">
+                        <input type="radio" name="mode" id="mode-adaptive" value="adaptive">
+                        <label for="mode-adaptive">Adaptif</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-group" id="iter-group">
+                <div class="control-label">
+                    <span>Max Iterations</span>
+                    <span class="value-badge" id="max-iter-val">50</span>
+                </div>
+                <input type="range" id="max-iter-range" min="10" max="200" step="5" value="50">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Step Speed</span>
+                    <span class="value-badge" id="speed-val">100ms</span>
+                </div>
+                <input type="range" id="speed-range" min="20" max="500" step="10" value="100">
+            </div>
+
+            <div class="control-group">
+                <div class="switch-container">
+                    <label style="font-size: 0.85rem; color: var(--text-secondary);" for="decay-toggle">Learning Rate
+                        Decay</label>
+                    <label class="switch">
+                        <input type="checkbox" id="decay-toggle" aria-label="Enable Learning Rate Decay">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <button class="btn-primary" id="start-btn">Start</button>
+                <button class="btn-secondary" id="reset-btn">Reset</button>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Iteration</div>
+                    <div class="stat-value" id="iter-stat">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Current X</div>
+                    <div class="stat-value" id="x-stat">-4.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Loss f(x)</div>
+                    <div class="stat-value" id="y-stat">16.00</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Gradient</div>
+                    <div class="stat-value" id="grad-stat">0.00</div>
+                </div>
+                <div class="stat-card" id="eff-lr-card" style="display: none;">
+                    <div class="stat-label">Eff. Learning Rate</div>
+                    <div class="stat-value" id="eff-lr-stat">0.000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-area">
+            <div class="canvas-container">
+                <div class="formula-overlay" id="formula-display">
+                    f(x) = x²<br>
+                    f'(x) = <span>2x</span>
+                </div>
+                <canvas id="canvas1"></canvas>
+            </div>
+            <div class="canvas-container">
+                <div class="formula-overlay">
+                    <span>Loss Curve</span><br>
+                    f(x) vs Iter
+                </div>
+                <canvas id="canvas2"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas1 = document.getElementById('canvas1');
+        const ctx1 = canvas1.getContext('2d');
+        const canvas2 = document.getElementById('canvas2');
+        const ctx2 = canvas2.getContext('2d');
+
+        const lrRange = document.getElementById('lr-range');
+        const startRange = document.getElementById('start-range');
+        const speedRange = document.getElementById('speed-range');
+        const maxIterRange = document.getElementById('max-iter-range');
+        const startBtn = document.getElementById('start-btn');
+        const resetBtn = document.getElementById('reset-btn');
+
+        const lrVal = document.getElementById('lr-val');
+        const startVal = document.getElementById('start-val');
+        const speedVal = document.getElementById('speed-val');
+        const maxIterVal = document.getElementById('max-iter-val');
+
+        const iterStat = document.getElementById('iter-stat');
+        const xStat = document.getElementById('x-stat');
+        const yStat = document.getElementById('y-stat');
+        const gradStat = document.getElementById('grad-stat');
+        const effLrStat = document.getElementById('eff-lr-stat');
+        const effLrCard = document.getElementById('eff-lr-card');
+        const decayToggle = document.getElementById('decay-toggle');
+
+        const modeFixed = document.getElementById('mode-fixed');
+        const modeAdaptive = document.getElementById('mode-adaptive');
+        const iterGroup = document.getElementById('iter-group');
+        const funcSelect = document.getElementById('func-select');
+        const formulaDisplay = document.getElementById('formula-display');
+
+        let x = -4;
+        let iteration = 0;
+        let running = false;
+        let history = [];
+        let timer = null;
+
+        const functions = {
+            quadratic: {
+                f: (x) => x * x,
+                df: (x) => 2 * x,
+                formula: "f(x) = x²<br>f'(x) = <span>2x</span>",
+                range: { minX: -6, maxX: 6, minY: -1, maxY: 30 }
+            },
+            absolute: {
+                f: (x) => Math.abs(x),
+                df: (x) => x === 0 ? 0 : (x > 0 ? 1 : -1),
+                formula: "f(x) = |x|<br>f'(x) = <span>sign(x)</span>",
+                range: { minX: -6, maxX: 6, minY: -1, maxY: 10 }
+            },
+            quartic: {
+                f: (x) => Math.pow(x, 4) * 0.1,
+                df: (x) => 0.4 * Math.pow(x, 3),
+                formula: "f(x) = 0.1x⁴<br>f'(x) = <span>0.4x³</span>",
+                range: { minX: -6, maxX: 6, minY: -5, maxY: 80 }
+            },
+            nonconvex: {
+                f: (x) => x * x + 5 * Math.sin(2 * x),
+                df: (x) => 2 * x + 10 * Math.cos(2 * x),
+                formula: "f(x) = x² + 5sin(2x)<br>f'(x) = <span>2x + 10cos(2x)</span>",
+                range: { minX: -6, maxX: 6, minY: -10, maxY: 40 }
+            }
+        };
+
+        function getCurrent() {
+            return functions[funcSelect.value];
+        }
+
+        function f(x) { return getCurrent().f(x); }
+        function df(x) { return getCurrent().df(x); }
+
+        function init() {
+            resize();
+            reset();
+            window.addEventListener('resize', resize);
+        }
+
+        function resize() {
+            const containers = document.querySelectorAll('.canvas-container');
+
+            [canvas1, canvas2].forEach((canvas, i) => {
+                const rect = containers[i].getBoundingClientRect();
+                canvas.width = rect.width * devicePixelRatio;
+                canvas.height = rect.height * devicePixelRatio;
+                const ctx = i === 0 ? ctx1 : ctx2;
+                ctx.resetTransform();
+                ctx.scale(devicePixelRatio, devicePixelRatio);
+            });
+            draw();
+        }
+
+        function reset() {
+            stop();
+            x = parseFloat(startRange.value);
+            iteration = 0;
+            history = [{ x: x, y: f(x) }];
+            updateStats();
+            draw();
+        }
+
+        function stop() {
+            running = false;
+            startBtn.textContent = 'Start';
+            if (timer) clearTimeout(timer);
+        }
+
+        function step() {
+            if (!running) return;
+
+            const baseLr = parseFloat(lrRange.value);
+            const useDecay = decayToggle.checked;
+
+            // Formula Decay: eta = eta0 / (1 + k * iteration)
+            const lr = useDecay ? (baseLr / (1 + 0.05 * iteration)) : baseLr;
+
+            const grad = df(x);
+
+            x = x - lr * grad;
+            iteration++;
+
+            history.push({ x: x, y: f(x) });
+
+            updateStats();
+            draw();
+
+            // Stopping Logic
+            const isAdaptive = modeAdaptive.checked;
+            const maxIter = parseInt(maxIterRange.value);
+
+            if (isAdaptive) {
+                // Adaptive: stop if converged or exploded
+                if (Math.abs(grad) < 0.001 || iteration > 500 || Math.abs(x) > 20) {
+                    stop();
+                    return;
+                }
+            } else {
+                // Fixed: stop at max iter or if exploded
+                if (iteration >= maxIter || Math.abs(x) > 20) {
+                    stop();
+                    return;
+                }
+            }
+
+            timer = setTimeout(step, parseInt(speedRange.value));
+        }
+
+        function updateStats() {
+            lrVal.textContent = parseFloat(lrRange.value).toFixed(3);
+            startVal.textContent = parseFloat(startRange.value).toFixed(1);
+            speedVal.textContent = speedRange.value + 'ms';
+            maxIterVal.textContent = maxIterRange.value;
+
+            iterStat.textContent = iteration;
+            xStat.textContent = x.toFixed(3);
+            yStat.textContent = f(x).toFixed(3);
+            gradStat.textContent = df(x).toFixed(3);
+
+            const useDecay = decayToggle.checked;
+            if (useDecay && iteration > 0) {
+                effLrCard.style.display = 'block';
+                const baseLr = parseFloat(lrRange.value);
+                const effLr = baseLr / (1 + 0.05 * iteration);
+                effLrStat.textContent = effLr.toFixed(4);
+            } else {
+                effLrCard.style.display = 'none';
+            }
+
+            iterGroup.style.opacity = modeFixed.checked ? '1' : '0.3';
+            iterGroup.style.pointerEvents = modeFixed.checked ? 'auto' : 'none';
+
+            formulaDisplay.innerHTML = getCurrent().formula;
+
+            if (Math.abs(x) > 20) {
+                xStat.style.color = 'var(--danger)';
+                yStat.style.color = 'var(--danger)';
+            } else {
+                xStat.style.color = 'var(--text-primary)';
+                yStat.style.color = 'var(--text-primary)';
+            }
+        }
+
+        function draw() {
+            drawParabola();
+            drawLoss();
+        }
+
+        function drawParabola() {
+            const w = canvas1.width / devicePixelRatio;
+            const h = canvas1.height / devicePixelRatio;
+            ctx1.clearRect(0, 0, w, h);
+
+            // Grid
+            ctx1.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            ctx1.lineWidth = 1;
+            for (let i = 0; i < w; i += 50) { ctx1.beginPath(); ctx1.moveTo(i, 0); ctx1.lineTo(i, h); ctx1.stroke(); }
+            for (let i = 0; i < h; i += 50) { ctx1.beginPath(); ctx1.moveTo(0, i); ctx1.lineTo(w, i); ctx1.stroke(); }
+
+            const padding = 50;
+            const { minX, maxX, minY, maxY } = getCurrent().range;
+
+            const toSX = (vx) => padding + (vx - minX) / (maxX - minX) * (w - 2 * padding);
+            const toSY = (vy) => h - padding - (vy - minY) / (maxY - minY) * (h - 2 * padding);
+
+            // Axes
+            ctx1.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx1.beginPath(); ctx1.moveTo(toSX(minX), toSY(0)); ctx1.lineTo(toSX(maxX), toSY(0)); ctx1.stroke();
+            ctx1.beginPath(); ctx1.moveTo(toSX(0), toSY(minY)); ctx1.lineTo(toSX(0), toSY(maxY)); ctx1.stroke();
+
+            // Parabola
+            ctx1.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx1.beginPath();
+            for (let vx = minX; vx <= maxX; vx += 0.1) {
+                const vy = f(vx);
+                if (vx === minX) ctx1.moveTo(toSX(vx), toSY(vy)); else ctx1.lineTo(toSX(vx), toSY(vy));
+            }
+            ctx1.stroke();
+
+            // Path
+            if (history.length > 1) {
+                ctx1.strokeStyle = varColor('--accent-color');
+                ctx1.setLineDash([5, 5]);
+                ctx1.beginPath();
+                ctx1.moveTo(toSX(history[0].x), toSY(history[0].y));
+                history.forEach(p => ctx1.lineTo(toSX(p.x), toSY(p.y)));
+                ctx1.stroke();
+                ctx1.setLineDash([]);
+            }
+
+            // Ball
+            const sx = toSX(x), sy = toSY(f(x));
+            const grad = ctx1.createRadialGradient(sx, sy, 0, sx, sy, 12);
+            grad.addColorStop(0, varColor('--accent-color')); grad.addColorStop(1, 'transparent');
+            ctx1.fillStyle = grad; ctx1.beginPath(); ctx1.arc(sx, sy, 12, 0, Math.PI * 2); ctx1.fill();
+            ctx1.fillStyle = varColor('--accent-color'); ctx1.beginPath(); ctx1.arc(sx, sy, 5, 0, Math.PI * 2); ctx1.fill();
+            ctx1.strokeStyle = '#fff'; ctx1.lineWidth = 1; ctx1.stroke();
+        }
+
+        function drawLoss() {
+            const w = canvas2.width / devicePixelRatio;
+            const h = canvas2.height / devicePixelRatio;
+            ctx2.clearRect(0, 0, w, h);
+
+            ctx2.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+            for (let i = 0; i < w; i += 50) { ctx2.beginPath(); ctx2.moveTo(i, 0); ctx2.lineTo(i, h); ctx2.stroke(); }
+            for (let i = 0; i < h; i += 50) { ctx2.beginPath(); ctx2.moveTo(0, i); ctx2.lineTo(w, i); ctx2.stroke(); }
+
+            const padding = 50;
+            const maxI = Math.max(20, history.length + 5);
+            const maxY = Math.max(25, ...history.map(p => p.y)) + 5;
+
+            const toSX = (i) => padding + (i / maxI) * (w - 2 * padding);
+            const toSY = (vy) => h - padding - (vy / maxY) * (h - 2 * padding);
+
+            // Axes
+            ctx2.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx2.beginPath(); ctx2.moveTo(padding, h - padding); ctx2.lineTo(w - padding, h - padding); ctx2.stroke();
+            ctx2.beginPath(); ctx2.moveTo(padding, padding); ctx2.lineTo(padding, h - padding); ctx2.stroke();
+
+            // Loss Path
+            if (history.length > 0) {
+                ctx2.strokeStyle = varColor('--accent-color');
+                ctx2.lineWidth = 2;
+                ctx2.beginPath();
+                ctx2.moveTo(toSX(0), toSY(history[0].y));
+                history.forEach((p, i) => ctx2.lineTo(toSX(i), toSY(p.y)));
+                ctx2.stroke();
+
+                // Current Point
+                const sx = toSX(history.length - 1);
+                const sy = toSY(history[history.length - 1].y);
+                ctx2.fillStyle = varColor('--accent-color');
+                ctx2.beginPath(); ctx2.arc(sx, sy, 4, 0, Math.PI * 2); ctx2.fill();
+            }
+
+            ctx2.fillStyle = varColor('--text-secondary');
+            ctx2.font = '10px JetBrains Mono';
+            ctx2.fillText('Iterasi', w / 2, h - 15);
+            ctx2.save();
+            ctx2.translate(15, h / 2);
+            ctx2.rotate(-Math.PI / 2);
+            ctx2.fillText('Loss', 0, 0);
+            ctx2.restore();
+        }
+
+        function varColor(name) {
+            return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+
+        // Events
+        [lrRange, startRange, speedRange, maxIterRange].forEach(el => {
+            el.addEventListener('input', () => {
+                if (el === startRange && !running) reset();
+                updateStats();
+            });
+        });
+
+        [modeFixed, modeAdaptive].forEach(el => {
+            el.addEventListener('change', updateStats);
+        });
+
+        funcSelect.addEventListener('change', () => {
+            reset();
+            updateStats();
+        });
+
+        startBtn.addEventListener('click', () => {
+            if (running) {
+                stop();
+            } else {
+                if (Math.abs(x) > 20) reset();
+                running = true;
+                startBtn.textContent = 'Pause';
+                step();
+            }
+        });
+
+        resetBtn.addEventListener('click', reset);
+
+        init();
+    </script>
+</body>
+
+</html>

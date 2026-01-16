@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -13,16 +14,16 @@
             grid-template-columns: 1fr 1fr;
             gap: 1rem;
         }
-        
+
         .canvas-box {
             position: relative;
         }
-        
+
         .canvas-box canvas {
             width: 100%;
             height: 300px;
         }
-        
+
         .formula-overlay {
             position: absolute;
             top: 10px;
@@ -35,47 +36,47 @@
             font-size: 0.85rem;
             pointer-events: none;
         }
-        
+
         .formula-overlay span {
             color: #ffd93d;
         }
-        
+
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-top: 1rem;
         }
-        
+
         .stat-card {
             background: #f8f9fa;
             padding: 12px;
             border-radius: 8px;
             border-left: 4px solid #667eea;
         }
-        
+
         .stat-card.decay {
             border-left-color: #764ba2;
         }
-        
+
         .stat-label {
             font-size: 0.75rem;
             color: #666;
             text-transform: uppercase;
             margin-bottom: 4px;
         }
-        
+
         .stat-value {
             font-family: 'Consolas', 'Courier New', monospace;
             font-size: 1.1rem;
             font-weight: 600;
             color: #333;
         }
-        
+
         .stat-value.danger {
             color: #dc3545;
         }
-        
+
         .mode-selector {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -85,11 +86,11 @@
             border-radius: 8px;
             margin-bottom: 15px;
         }
-        
+
         .mode-option input {
             display: none;
         }
-        
+
         .mode-option label {
             display: block;
             padding: 8px;
@@ -101,32 +102,32 @@
             text-align: center;
             font-weight: 600;
         }
-        
-        .mode-option input:checked + label {
+
+        .mode-option input:checked+label {
             background: #667eea;
             color: white;
         }
-        
+
         .switch-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
             padding: 10px 0;
         }
-        
+
         .switch {
             position: relative;
             display: inline-block;
             width: 44px;
             height: 22px;
         }
-        
+
         .switch input {
             opacity: 0;
             width: 0;
             height: 0;
         }
-        
+
         .slider {
             position: absolute;
             cursor: pointer;
@@ -138,7 +139,7 @@
             transition: 0.4s;
             border-radius: 34px;
         }
-        
+
         .slider:before {
             position: absolute;
             content: "";
@@ -150,40 +151,71 @@
             transition: 0.4s;
             border-radius: 50%;
         }
-        
-        input:checked + .slider {
+
+        input:checked+.slider {
             background-color: #667eea;
         }
-        
-        input:checked + .slider:before {
+
+        input:checked+.slider:before {
             transform: translateX(22px);
         }
-        
+
         .buttons-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
         }
-        
+
         .buttons-row button {
             margin: 0;
         }
-        
+
+        .demo-content {
+            height: calc(100vh - 250px);
+            min-height: 500px;
+            overflow: hidden;
+        }
+
+        .sidebar {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        /* Custom scrollbar for sidebar */
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+
+        .main-area {
+            height: 100%;
+            overflow-y: auto;
+        }
+
         @media (max-width: 768px) {
             .canvas-grid {
                 grid-template-columns: 1fr;
             }
-            
+
             .canvas-box canvas {
                 height: 250px;
             }
-            
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
     </style>
 </head>
+
 <body>
     <div class="demo-wrapper">
         <div class="demo-header">
@@ -208,7 +240,7 @@
 
                 <div class="control-group">
                     <h3>⚙️ Parameter</h3>
-                    
+
                     <div class="control-item">
                         <label>Learning Rate (η): <span class="value-display" id="lr-val">0.100</span></label>
                         <input type="range" id="lr-range" min="0.001" max="1.1" step="0.001" value="0.10">
@@ -218,7 +250,7 @@
                         <label>Posisi Awal (x₀): <span class="value-display" id="start-val">-4.0</span></label>
                         <input type="range" id="start-range" min="-5" max="5" step="0.1" value="-4.0">
                     </div>
-                    
+
                     <div class="control-item">
                         <label>Kecepatan: <span class="value-display" id="speed-val">100ms</span></label>
                         <input type="range" id="speed-range" min="20" max="500" step="10" value="100">
@@ -237,12 +269,12 @@
                             <label for="mode-adaptive">Adaptif</label>
                         </div>
                     </div>
-                    
+
                     <div class="control-item" id="iter-group">
                         <label>Max Iterasi: <span class="value-display" id="max-iter-val">50</span></label>
                         <input type="range" id="max-iter-range" min="10" max="200" step="5" value="50">
                     </div>
-                    
+
                     <div class="switch-container">
                         <label style="font-weight: 600; color: #333;">Learning Rate Decay</label>
                         <label class="switch">
@@ -260,10 +292,12 @@
                     </div>
                 </div>
 
-                <div style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px; margin-top: 10px;">
+                <div
+                    style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px; margin-top: 10px;">
                     <h4 style="color: #2196F3; margin-bottom: 10px; font-size: 1em;">📖 Info</h4>
                     <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
-                        <strong>Gradient Descent</strong> mencari minimum fungsi dengan bergerak berlawanan arah gradien.
+                        <strong>Gradient Descent</strong> mencari minimum fungsi dengan bergerak berlawanan arah
+                        gradien.
                     </p>
                     <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
                         <strong>Learning Rate Decay:</strong> η = η₀ / (1 + 0.05 × iter)
@@ -288,7 +322,7 @@
                         <canvas id="canvas2"></canvas>
                     </div>
                 </div>
-                
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-label">Iterasi</div>
@@ -320,13 +354,15 @@
             <div class="github-links">
                 <a href="https://github.com/galihboy" target="_blank">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
                     </svg>
                     @galihboy
                 </a>
                 <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
                     </svg>
                     @Galih-Hermawan-Unikom
                 </a>
@@ -340,4 +376,5 @@
     <script src="../assets/js/utils.js?v=2"></script>
     <script src="gradient-descent.js?v=2"></script>
 </body>
+
 </html>
