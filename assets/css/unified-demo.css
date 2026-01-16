@@ -1,4 +1,65 @@
-/* Unified Demo Template CSS */
+:root {
+    --bg-color: #f5f7fa;
+    --card-bg: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #666666;
+    --header-bg: #1a237e;
+    --footer-bg: #1a237e;
+    --sidebar-bg: #f8f9fa;
+    --accent: #667eea;
+    --accent-hover: #5568d3;
+    --border-color: #e0e0e0;
+    --shadow: rgba(0, 0, 0, 0.1);
+    --step-info-bg: #eef2ff;
+    --step-info-text: #1a237e;
+    --header-overlay: rgba(26, 35, 126, 0.85);
+}
+
+[data-theme='dark'] {
+    --bg-color: #0f172a;
+    --card-bg: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --header-bg: #020617;
+    --footer-bg: #020617;
+    --sidebar-bg: #111827;
+    --accent: #38bdf8;
+    --accent-hover: #7dd3fc;
+    --border-color: #334155;
+    --shadow: rgba(0, 0, 0, 0.3);
+    --github-link-bg: rgba(255, 255, 255, 0.05);
+    --github-link-hover-bg: rgba(255, 255, 255, 0.1);
+    --step-info-bg: #1e293b;
+    --step-info-text: #38bdf8;
+    --header-overlay: rgba(2, 6, 23, 0.9);
+}
+
+.theme-switch {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    z-index: 100;
+    appearance: none;
+    /* Added for consistency */
+}
+
+.theme-switch:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,7 +68,8 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: var(--bg-color);
+    color: var(--text-primary);
     min-height: 100vh;
     padding: 20px;
 }
@@ -15,15 +77,18 @@ body {
 .demo-wrapper {
     max-width: 1400px;
     margin: 0 auto;
-    background: white;
+    background: var(--card-bg);
     border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    box-shadow: 0 20px 60px var(--shadow);
     overflow: hidden;
 }
 
 /* Header */
 .demo-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(var(--header-overlay), var(--header-overlay)), url('../images/gbr_atas.webp');
+    background-color: var(--header-bg);
+    background-size: cover;
+    background-position: center;
     color: white;
     padding: 30px;
     text-align: center;
@@ -37,14 +102,14 @@ body {
     color: white;
     text-decoration: none;
     padding: 8px 16px;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 5px;
     font-weight: 600;
     transition: background 0.3s;
 }
 
 .back-link:hover {
-    background: rgba(255,255,255,0.3);
+    background: rgba(255, 255, 255, 0.3);
 }
 
 .demo-header h1 {
@@ -66,9 +131,9 @@ body {
 }
 
 .sidebar {
-    background: #f8f9fa;
+    background: var(--sidebar-bg);
     padding: 30px;
-    border-right: 2px solid #e0e0e0;
+    border-right: 2px solid var(--border-color);
 }
 
 .main-area {
@@ -77,18 +142,18 @@ body {
 
 /* Controls */
 .control-group {
-    background: white;
+    background: var(--card-bg);
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px var(--shadow);
 }
 
 .control-group h3 {
-    color: #667eea;
+    color: var(--accent);
     margin-bottom: 15px;
     font-size: 1.2em;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 2px solid var(--accent);
     padding-bottom: 10px;
 }
 
@@ -100,16 +165,18 @@ body {
     display: block;
     margin-bottom: 5px;
     font-weight: 600;
-    color: #333;
+    color: var(--text-primary);
 }
 
 .control-item input[type="range"] {
     width: 100%;
     height: 8px;
     border-radius: 5px;
-    background: #ddd;
+    background: var(--border-color);
     outline: none;
     -webkit-appearance: none;
+    appearance: none;
+    outline: none;
 }
 
 .control-item input[type="range"]::-webkit-slider-thumb {
@@ -118,7 +185,7 @@ body {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #667eea;
+    background: var(--accent);
     cursor: pointer;
 }
 
@@ -133,7 +200,7 @@ body {
 
 .value-display {
     display: inline-block;
-    background: #667eea;
+    background: var(--accent);
     color: white;
     padding: 5px 15px;
     border-radius: 20px;
@@ -154,12 +221,12 @@ button {
 }
 
 .btn-primary {
-    background: #667eea;
+    background: var(--accent);
     color: white;
 }
 
 .btn-primary:hover {
-    background: #5568d3;
+    background: var(--accent-hover);
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
 }
@@ -184,20 +251,21 @@ button {
 
 /* Canvas */
 canvas {
-    border: 3px solid #667eea;
+    border: 3px solid var(--accent);
     border-radius: 10px;
-    background: white;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    background: var(--card-bg);
+    box-shadow: 0 5px 20px var(--shadow);
     display: block;
     margin: 0 auto;
 }
 
 /* Footer */
 .demo-footer {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background-color: var(--footer-bg);
     color: white;
     padding: 30px;
     text-align: center;
+    border-top: 4px solid var(--accent);
 }
 
 .demo-footer p {
@@ -247,12 +315,13 @@ canvas {
     gap: 5px;
     padding: 8px 12px;
     background: rgba(255, 255, 255, 0.1);
+    background: var(--github-link-bg);
     border-radius: 8px;
     font-size: 0.9em;
 }
 
 .demo-footer .github-links a:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: var(--github-link-hover-bg);
     transform: translateY(-2px);
 }
 
@@ -271,42 +340,42 @@ canvas {
         display: flex;
         flex-direction: column;
     }
-    
+
     .sidebar {
         border-right: none;
-        border-top: 2px solid #e0e0e0;
+        border-top: 2px solid var(--border-color);
         order: 2;
         padding: 15px;
     }
-    
+
     .main-area {
         order: 1;
         padding: 10px;
     }
-    
+
     .back-link {
         position: static;
         display: inline-block;
         margin-bottom: 15px;
     }
-    
+
     /* Canvas */
     .main-area canvas {
         width: 100% !important;
         height: auto !important;
         max-height: 60vh;
     }
-    
+
     /* Controls */
     .control-item label {
         font-size: 0.85rem;
     }
-    
+
     .value-display {
         font-size: 0.8rem;
         padding: 4px 12px;
     }
-    
+
     .control-group button {
         font-size: 0.85rem;
         padding: 10px;
@@ -318,16 +387,16 @@ canvas {
     .main-area canvas {
         max-height: 50vh;
     }
-    
+
     .control-item label {
         font-size: 0.8rem;
     }
-    
+
     .value-display {
         font-size: 0.75rem;
         padding: 3px 10px;
     }
-    
+
     .control-group button {
         font-size: 0.8rem;
         padding: 8px;

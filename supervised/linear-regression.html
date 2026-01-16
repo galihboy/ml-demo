@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -8,19 +9,23 @@
     <title>Linear Regression Demo - ML Demo</title>
     <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
 </head>
+
 <body>
     <div class="demo-wrapper">
         <div class="demo-header">
+            <button id="theme-toggle" class="theme-switch" aria-label="Toggle Theme">🌙</button>
             <a href="../index.html" class="back-link">← Kembali</a>
-            <h1>Linear Regression</h1>
-            <p>Visualisasi regresi linear dengan gradient descent</p>
+            <h1>Regresi Linear</h1>
+            <p>Visualisasi garis regresi dan optimasi gradient descent</p>
         </div>
+        <script src="../assets/js/utils.js"></script>
+        <script>initTheme();</script>
 
         <div class="demo-content">
             <div class="sidebar">
                 <div class="control-group">
                     <h3>⚙️ Pengaturan</h3>
-                    
+
                     <div class="control-item">
                         <label>Learning Rate: <span class="value-display" id="lrValue">0.01</span></label>
                         <input type="range" id="learningRate" min="0.001" max="0.1" step="0.001" value="0.01">
@@ -44,12 +49,14 @@
                     <button class="btn-secondary" id="resetBtn">🔄 Reset</button>
                 </div>
 
-                <div style="background: #e7f3ff; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                <div
+                    style="background: var(--step-info-bg); border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px; margin-top: 20px;">
                     <h4 style="color: #2196F3; margin-bottom: 10px; font-size: 1em;">📖 Info</h4>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
-                        <strong>Epoch/Iterasi:</strong> Satu iterasi = satu kali update parameter (slope & intercept) menggunakan semua data.
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary);">
+                        <strong>Epoch/Iterasi:</strong> Satu iterasi = satu kali update parameter (slope & intercept)
+                        menggunakan semua data.
                     </p>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); margin-top: 8px;">
                         Training akan berhenti otomatis setelah mencapai max iterasi yang ditentukan.
                     </p>
                 </div>
@@ -57,8 +64,9 @@
 
             <div class="main-area">
                 <canvas id="canvas" width="800" height="500" touch-action="none"></canvas>
-                <div style="margin-top: 1.5rem; padding: 15px; background: #f8f9fa; border-radius: 10px;">
-                    <p><strong>Iterasi:</strong> <span id="iteration">0</span> / <span id="maxIterDisplay">1000</span></p>
+                <div style="margin-top: 1.5rem; padding: 15px; background: var(--sidebar-bg); border-radius: 10px;">
+                    <p><strong>Iterasi:</strong> <span id="iteration">0</span> / <span id="maxIterDisplay">1000</span>
+                    </p>
                     <p><strong>Cost:</strong> <span id="cost">0</span></p>
                     <p><strong>Persamaan:</strong> y = <span id="slope">0</span>x + <span id="intercept">0</span></p>
                 </div>
@@ -71,13 +79,15 @@
             <div class="github-links">
                 <a href="https://github.com/galihboy" target="_blank">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
                     </svg>
                     @galihboy
                 </a>
                 <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank">
                     <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
-                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+                        <path
+                            d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z" />
                     </svg>
                     @Galih-Hermawan-Unikom
                 </a>
@@ -91,4 +101,5 @@
     <script src="../assets/js/utils.js?v=2"></script>
     <script src="linear-regression.js?v=2"></script>
 </body>
+
 </html>

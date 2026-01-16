@@ -14,10 +14,10 @@
             flex-direction: column;
             gap: 15px;
             margin-top: 2rem;
-            background: white;
+            background: var(--card-bg);
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px var(--shadow);
         }
 
         .fold-row {
@@ -30,7 +30,7 @@
             width: 80px;
             font-weight: bold;
             font-size: 0.9rem;
-            color: #555;
+            color: var(--text-secondary);
         }
 
         .fold-bar {
@@ -39,7 +39,7 @@
             height: 35px;
             border-radius: 6px;
             overflow: hidden;
-            border: 1px solid #ddd;
+            border: 1px solid var(--border-color);
         }
 
         .fold-block {
@@ -78,23 +78,23 @@
         }
 
         .stat-card {
-            background: #f8f9fa;
+            background: var(--sidebar-bg);
             padding: 15px;
             border-radius: 8px;
             text-align: center;
-            border: 1px solid #eee;
+            border: 1px solid var(--border-color);
         }
 
         .stat-value {
             display: block;
             font-size: 1.2rem;
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .stat-label {
             font-size: 0.75rem;
-            color: #888;
+            color: var(--text-secondary);
             text-transform: uppercase;
         }
 
@@ -108,10 +108,13 @@
 <body>
     <div class="demo-wrapper">
         <div class="demo-header">
+            <button id="theme-toggle" class="theme-switch" aria-label="Toggle Theme">🌙</button>
             <a href="../index.html" class="back-link">← Kembali</a>
             <h1>K-Fold Cross-Validation</h1>
-            <p>Visualisasi proses pembagian data (Splitting) secara berulang</p>
+            <p>Validasi model dengan pembagian data K-lipat</p>
         </div>
+        <script src="../assets/js/utils.js"></script>
+        <script>initTheme();</script>
 
         <div class="demo-content">
             <div class="sidebar">
@@ -130,13 +133,13 @@
                 </div>
 
                 <div
-                    style="background: #e6ffed; border-left: 4px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    style="background: var(--step-info-bg); border-left: 4px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 20px;">
                     <h4 style="color: #28a745; margin-bottom: 10px; font-size: 1em;">📝 Penjelasan</h4>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary);">
                         Kotak <span class="highlight-text" style="color: #667eea;">Biru</span> adalah data yang
                         digunakan untuk <strong>Training</strong>.
                     </p>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); margin-top: 8px;">
                         Kotak <span class="highlight-text" style="color: #f1c40f;">Kuning</span> adalah data yang
                         digunakan untuk <strong>Validation</strong> (pengujian fold tersebut).
                     </p>
@@ -153,7 +156,7 @@
                 </div>
 
                 <div
-                    style="margin-top: 2rem; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;">
+                    style="margin-top: 2rem; background: var(--card-bg); padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px var(--shadow); text-align: center;">
                     <p><strong>Rata-rata Akurasi (CV Score):</strong> <span id="avgAccuracy"
                             style="font-size: 1.5rem; font-weight: bold; color: #28a745;">0.00%</span></p>
                 </div>

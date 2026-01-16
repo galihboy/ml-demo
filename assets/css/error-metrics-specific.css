@@ -5,9 +5,9 @@
 
 .error-metrics-layout .plot-card {
     padding: 20px;
-    background: white;
+    background: var(--card-bg);
     border-radius: 10px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 10px var(--shadow);
 }
 
 .error-metrics-layout .plot-card #plot {
@@ -43,7 +43,7 @@
 
 .error-metrics-layout .slider-row label {
     font-size: 0.9rem;
-    color: #374151;
+    color: var(--text-primary);
     font-weight: 600;
 }
 
@@ -51,7 +51,7 @@
     width: 100%;
     height: 8px;
     border-radius: 5px;
-    background: #ddd;
+    background: var(--border-color);
     outline: none;
     -webkit-appearance: none;
     appearance: none;
@@ -80,14 +80,17 @@
     width: 100%;
     padding: 8px;
     font-size: 0.9rem;
-    border: 2px solid #e0e0e0;
+    padding: 8px;
+    font-size: 0.9rem;
+    border: 2px solid var(--border-color);
     border-radius: 5px;
-    background: white;
+    background: var(--card-bg);
+    color: var(--text-primary);
 }
 
 .error-metrics-layout .slider-row input[type="number"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--accent);
 }
 
 .error-metrics-layout #summary,
@@ -100,7 +103,7 @@
 .error-metrics-layout #summary code,
 .error-metrics-layout #step-detail code,
 .error-metrics-layout #formula-box code {
-    background: rgba(102, 126, 234, 0.1);
+    background: var(--bg-color);
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.9rem;
@@ -109,7 +112,7 @@
 
 .error-metrics-layout .step-row {
     padding: 12px 0;
-    border-bottom: 1px dashed rgba(148, 163, 184, 0.45);
+    border-bottom: 1px dashed var(--border-color);
 }
 
 .error-metrics-layout .step-row:last-child {
@@ -119,7 +122,7 @@
 .error-metrics-layout .formula-line {
     margin-bottom: 10px;
     padding: 8px;
-    background: #f8f9fa;
+    background: var(--sidebar-bg);
     border-radius: 5px;
 }
 
@@ -130,7 +133,7 @@
     gap: 20px;
     padding: 30px;
     grid-template-columns: 1fr;
-    background: white;
+    background: var(--bg-color);
 }
 
 .error-metrics-layout .controls-row,

@@ -16,7 +16,7 @@
             gap: 10px;
             margin-top: 15px;
             padding: 10px;
-            background: #f8f9fa;
+            background: var(--sidebar-bg);
             border-radius: 8px;
         }
 
@@ -31,7 +31,7 @@
             width: 15px;
             height: 15px;
             border-radius: 50%;
-            border: 1px solid #333;
+            border: 1px solid var(--text-primary);
         }
 
         .point-noise {
@@ -50,17 +50,18 @@
         }
 
         .step-info {
-            background: linear-gradient(135deg, #009688 0%, #4CAF50 100%);
-            color: white;
+            background-color: var(--step-info-bg);
+            color: var(--step-info-text);
             padding: 15px;
             border-radius: 10px;
             margin-bottom: 20px;
+            border-left: 5px solid var(--accent);
         }
 
         .step-info h3 {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            border-bottom: 1px solid var(--accent);
             margin-bottom: 8px;
-            color: white !important;
+            color: var(--step-info-text) !important;
         }
 
         /* Dendrogram Canvas Styling */
@@ -84,21 +85,21 @@
         /* ... reused styles ... */
         .calculation-panel {
             margin-top: 20px;
-            background: #fff;
-            border: 1px solid #ddd;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
             border-radius: 10px;
             overflow: hidden;
         }
 
         .calc-header {
-            background: #f1f5f9;
+            background: var(--sidebar-bg);
             padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
-            color: #333;
+            color: var(--text-primary);
         }
 
         .calc-content {
@@ -107,13 +108,14 @@
             padding: 15px;
             font-family: 'Consolas', 'Monaco', monospace;
             font-size: 0.9em;
-            background: #fafafa;
+            background: var(--bg-color);
+            color: var(--text-primary);
         }
 
         .calc-item {
             margin-bottom: 10px;
             padding-bottom: 10px;
-            border-bottom: 1px dashed #eee;
+            border-bottom: 1px dashed var(--border-color);
         }
 
         .calc-item:last-child {
@@ -181,10 +183,13 @@
 <body>
     <div class="demo-wrapper">
         <div class="demo-header">
+            <button id="theme-toggle" class="theme-switch" aria-label="Toggle Theme">🌙</button>
             <a href="../index.html" class="back-link">← Kembali</a>
             <h1>Hierarchical Clustering</h1>
-            <p>Visualisasi Agglomerative Clustering & Dendrogram</p>
+            <p>Demo interaktif Agglomerative Clustering dan Dendrogram</p>
         </div>
+        <script src="../assets/js/utils.js"></script>
+        <script>initTheme();</script>
 
         <div class="demo-content">
             <div class="sidebar">
@@ -207,7 +212,7 @@
                     </div>
 
                     <div id="learningControls"
-                        style="display: none; margin-bottom: 15px; background: #eef2ff; padding: 10px; border-radius: 5px;">
+                        style="display: none; margin-bottom: 15px; background: var(--step-info-bg); padding: 10px; border-radius: 5px;">
                         <div class="control-item" style="margin-bottom: 0;">
                             <label>Max Titik Data: <span class="value-display" id="maxPointsDisplay">10</span></label>
                             <input type="range" id="maxPointsSlider" min="3" max="20" value="10">
@@ -217,7 +222,7 @@
                     <div class="control-item">
                         <label>Metode Linkage:</label>
                         <select id="linkageType"
-                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
                             <option value="single">Single Linkage (Min)</option>
                             <option value="complete">Complete Linkage (Max)</option>
                             <option value="average">Average Linkage (Mean)</option>
@@ -233,7 +238,7 @@
                     <div class="control-item">
                         <label>Pola Data:</label>
                         <select id="dataType"
-                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; background: white;">
+                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
                             <option value="blobs">Gugusan (Blobs)</option>
                             <option value="moons">Bulan Sabit (Moons)</option>
                             <option value="circles">Lingkaran (Circles)</option>
@@ -289,12 +294,14 @@
 
                 <div
                     style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px;">
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
-                        <span style="display: block; font-size: 0.9em; color: #666;">Jumlah Titik</span>
-                        <strong style="font-size: 1.4em; color: #333;" id="pointCount">0</strong>
+                    <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 10px; text-align: center;">
+                        <span style="display: block; font-size: 0.9em; color: var(--text-secondary);">Jumlah
+                            Titik</span>
+                        <strong style="font-size: 1.4em; color: var(--text-primary);" id="pointCount">0</strong>
                     </div>
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; text-align: center;">
-                        <span style="display: block; font-size: 0.9em; color: #666;">Cluster Saat Ini</span>
+                    <div style="background: var(--sidebar-bg); padding: 15px; border-radius: 10px; text-align: center;">
+                        <span style="display: block; font-size: 0.9em; color: var(--text-secondary);">Cluster Saat
+                            Ini</span>
                         <strong style="font-size: 1.4em; color: #009688;" id="clusterCount">0</strong>
                     </div>
                 </div>
@@ -304,10 +311,10 @@
                     <div class="calc-header">
                         <span>🧮 Detail Jarak (Log)</span>
                         <button id="toggleCalc"
-                            style="background: none; border: none; font-size: 1.2em; cursor: pointer; color: #666; width: auto; padding: 0;">⬇️</button>
+                            style="background: none; border: none; font-size: 1.2em; cursor: pointer; color: var(--text-secondary); width: auto; padding: 0;">⬇️</button>
                     </div>
                     <div class="calc-content" id="calcLog">
-                        <div style="color: #888; text-align: center; padding: 20px;">
+                        <div style="color: var(--text-secondary); text-align: center; padding: 20px;">
                             Belum ada perhitungan.
                         </div>
                     </div>

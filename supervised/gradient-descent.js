@@ -62,6 +62,18 @@ const functions = {
     }
 };
 
+function getThemeColors() {
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return {
+        bg: isDark ? '#1e293b' : '#ffffff', // Match --card-bg
+        grid: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(102, 126, 234, 0.1)',
+        axis: isDark ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.3)',
+        text: isDark ? '#94a3b8' : '#666666',
+        curve: '#764ba2', // Keep consistent or adjust if needed
+        path: '#667eea'
+    };
+}
+
 function getCurrent() {
     return functions[funcSelect.value];
 }
@@ -73,6 +85,16 @@ function init() {
     resize();
     reset();
     window.addEventListener('resize', resize);
+
+    // Listen for theme changes to redraw canvas
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                draw();
+            }
+        });
+    });
+    observer.observe(document.documentElement, { attributes: true });
 }
 
 function resize() {
@@ -185,12 +207,14 @@ function drawParabola() {
     const h = canvas1.height / devicePixelRatio;
     ctx1.clearRect(0, 0, w, h);
 
+    const colors = getThemeColors();
+
     // Background
-    ctx1.fillStyle = '#f8f9fa';
+    ctx1.fillStyle = colors.bg;
     ctx1.fillRect(0, 0, w, h);
 
     // Grid
-    ctx1.strokeStyle = 'rgba(102, 126, 234, 0.1)';
+    ctx1.strokeStyle = colors.grid;
     ctx1.lineWidth = 1;
     for (let i = 0; i < w; i += 40) { ctx1.beginPath(); ctx1.moveTo(i, 0); ctx1.lineTo(i, h); ctx1.stroke(); }
     for (let i = 0; i < h; i += 40) { ctx1.beginPath(); ctx1.moveTo(0, i); ctx1.lineTo(w, i); ctx1.stroke(); }
@@ -202,7 +226,7 @@ function drawParabola() {
     const toSY = (vy) => h - padding - (vy - minY) / (maxY - minY) * (h - 2 * padding);
 
     // Axes
-    ctx1.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx1.strokeStyle = colors.axis;
     ctx1.lineWidth = 2;
     ctx1.beginPath(); ctx1.moveTo(toSX(minX), toSY(0)); ctx1.lineTo(toSX(maxX), toSY(0)); ctx1.stroke();
     ctx1.beginPath(); ctx1.moveTo(toSX(0), toSY(minY)); ctx1.lineTo(toSX(0), toSY(maxY)); ctx1.stroke();
@@ -238,12 +262,12 @@ function drawParabola() {
     ctx1.beginPath();
     ctx1.arc(sx, sy, 15, 0, Math.PI * 2);
     ctx1.fill();
-    
+
     ctx1.fillStyle = '#667eea';
     ctx1.beginPath();
     ctx1.arc(sx, sy, 8, 0, Math.PI * 2);
     ctx1.fill();
-    
+
     ctx1.strokeStyle = '#fff';
     ctx1.lineWidth = 2;
     ctx1.stroke();
@@ -254,11 +278,13 @@ function drawLoss() {
     const h = canvas2.height / devicePixelRatio;
     ctx2.clearRect(0, 0, w, h);
 
+    const colors = getThemeColors();
+
     // Background
-    ctx2.fillStyle = '#f8f9fa';
+    ctx2.fillStyle = colors.bg;
     ctx2.fillRect(0, 0, w, h);
 
-    ctx2.strokeStyle = 'rgba(102, 126, 234, 0.1)';
+    ctx2.strokeStyle = colors.grid;
     for (let i = 0; i < w; i += 40) { ctx2.beginPath(); ctx2.moveTo(i, 0); ctx2.lineTo(i, h); ctx2.stroke(); }
     for (let i = 0; i < h; i += 40) { ctx2.beginPath(); ctx2.moveTo(0, i); ctx2.lineTo(w, i); ctx2.stroke(); }
 
@@ -270,7 +296,7 @@ function drawLoss() {
     const toSY = (vy) => h - padding - (vy / maxY) * (h - 2 * padding);
 
     // Axes
-    ctx2.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx2.strokeStyle = colors.axis;
     ctx2.lineWidth = 2;
     ctx2.beginPath(); ctx2.moveTo(padding, h - padding); ctx2.lineTo(w - padding, h - padding); ctx2.stroke();
     ctx2.beginPath(); ctx2.moveTo(padding, padding); ctx2.lineTo(padding, h - padding); ctx2.stroke();
@@ -297,7 +323,7 @@ function drawLoss() {
     }
 
     // Axis Labels
-    ctx2.fillStyle = '#666';
+    ctx2.fillStyle = colors.text;
     ctx2.font = '12px Segoe UI';
     ctx2.fillText('Iterasi', w / 2, h - 10);
     ctx2.save();

@@ -10,12 +10,15 @@
 
 <body>
     <header>
+        <button id="theme-toggle" class="theme-switch" aria-label="Toggle Theme">🌙</button>
         <h1>🤖 ML Demo</h1>
         <p>Simulasi Interaktif Algoritma Pembelajaran Mesin</p>
         <p style="margin-top: 10px; font-size: 1rem; opacity: 0.9;">
             Kumpulan demo berbasis web untuk memahami konsep Machine Learning
         </p>
     </header>
+    <script src="assets/js/utils.js"></script>
+    <script>initTheme();</script>
 
     <main>
         <section class="demo-category">
@@ -112,7 +115,7 @@
         <p><strong>Dibuat oleh:</strong> <a href="https://galih.eu" target="_blank">Galih Hermawan</a></p>
         <p style="margin-top: 5px;">Prodi Teknik Informatika - Universitas Komputer Indonesia (UNIKOM)</p>
         <div style="margin-top: 15px; display: flex; gap: 15px; justify-content: center; align-items: center;">
-            <a href="https://github.com/galihboy" target="_blank"
+            <a href="https://github.com/galihboy" target="_blank" rel="noopener"
                 style="display: inline-flex; align-items: center; gap: 5px; color: #ffd93d; text-decoration: none; font-weight: 600;">
                 <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                     <path
@@ -120,7 +123,7 @@
                 </svg>
                 @galihboy
             </a>
-            <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank"
+            <a href="https://github.com/Galih-Hermawan-Unikom" target="_blank" rel="noopener"
                 style="display: inline-flex; align-items: center; gap: 5px; color: #ffd93d; text-decoration: none; font-weight: 600;">
                 <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor">
                     <path

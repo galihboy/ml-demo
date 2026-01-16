@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
     <style>
         .formula-box {
-            background: #f1f8ff;
+            background: var(--step-info-bg);
             padding: 10px;
             border-radius: 5px;
             font-family: 'Courier New', Courier, monospace;
@@ -48,10 +48,13 @@
 <body>
     <div class="demo-wrapper">
         <div class="demo-header">
+            <button id="theme-toggle" class="theme-switch" aria-label="Toggle Theme">🌙</button>
             <a href="../index.html" class="back-link">← Kembali</a>
-            <h1>Regularization Lab</h1>
-            <p>Memahami Overfitting dan Regularisasi (L1/L2) pada Regresi Polinomial</p>
+            <h1>Polynomial Regression</h1>
+            <p>Pemodelan hubungan non-linear antar data</p>
         </div>
+        <script src="../assets/js/utils.js"></script>
+        <script>initTheme();</script>
 
         <div class="demo-content">
             <div class="sidebar">
@@ -61,14 +64,15 @@
                     <div class="control-item">
                         <label>Derajat Polinomial: <span class="value-display" id="degreeValue">1</span></label>
                         <input type="range" id="degree" min="1" max="15" step="1" value="1">
-                        <p style="font-size: 0.7rem; color: #888;">Semakin tinggi = semakin kompleks (risiko overfit)
+                        <p style="font-size: 0.7rem; color: var(--text-secondary);">Semakin tinggi = semakin kompleks
+                            (risiko overfit)
                         </p>
                     </div>
 
                     <div class="control-item">
                         <label>Tipe Regularisasi:</label>
                         <select id="regType"
-                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd;">
+                            style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
                             <option value="none">Tanpa Regularisasi (OLS)</option>
                             <option value="l1">L1 - Lasso (Sparsity)</option>
                             <option value="l2">L2 - Ridge (Smoothness)</option>
@@ -92,13 +96,13 @@
                 </div>
 
                 <div
-                    style="background: #e6ffed; border-left: 4px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    style="background: var(--step-info-bg); border-left: 4px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 20px;">
                     <h4 style="color: #28a745; margin-bottom: 10px; font-size: 1em;">📝 Observasi</h4>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary);">
                         Gunakan <strong>Degree 10+</strong> tanpa regularisasi untuk melihat
                         <strong>Overfitting</strong>.
                     </p>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); margin-top: 8px;">
                         Lalu aktifkan <strong>Ridge</strong> dan perhatikan bagaimana garis menjadi lebih tenang
                         (smooth).
                     </p>
@@ -108,7 +112,7 @@
             <div class="main-area">
                 <canvas id="canvas" width="800" height="500" touch-action="none"></canvas>
 
-                <div style="margin-top: 1.5rem; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                <div style="margin-top: 1.5rem; padding: 15px; background: var(--sidebar-bg); border-radius: 10px;">
                     <div class="formula-box" id="formula">
                         y = w₀ + w₁x
                     </div>

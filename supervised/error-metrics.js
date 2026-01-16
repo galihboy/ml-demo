@@ -11,6 +11,28 @@
             return;
         }
 
+        // Helper for theme colors
+        function getThemeColors() {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            return {
+                text: isDark ? '#f1f5f9' : '#111111',
+                bg: isDark ? '#1e293b' : '#ffffff',
+                grid: isDark ? '#334155' : '#e5e7eb',
+                line: isDark ? '#cbd5e1' : '#444',
+                annotationBg: isDark ? 'rgba(30, 41, 59, 0.8)' : 'rgba(255, 255, 255, 0.8)'
+            };
+        }
+
+        // Observer for theme changes
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                    refresh();
+                }
+            });
+        });
+        observer.observe(document.documentElement, { attributes: true });
+
         const defaultControls = [
             { id: 'x1', label: 'x₁', min: -10, max: 10, step: 0.5, value: 1 },
             { id: 'y1', label: 'y₁', min: -10, max: 10, step: 0.5, value: 2.5 },
@@ -151,19 +173,23 @@
             const intercept = state.intercept;
             const { lineTrace, scatterTrace, residualTraces, rows } = computeData();
 
+            const colors = getThemeColors();
+
             Plotly.react('plot', [scatterTrace, lineTrace, ...residualTraces], {
                 margin: { l: 48, r: 20, t: 48, b: 48 },
-                legend: { x: 0.02, y: 0.98 },
-                title: 'Residual vertikal terhadap garis linier',
-                xaxis: { title: 'x' },
-                yaxis: { title: 'y' },
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                legend: { x: 0.02, y: 0.98, font: { color: colors.text } },
+                title: { text: 'Residual vertikal terhadap garis linier', font: { color: colors.text } },
+                xaxis: { title: 'x', color: colors.text, gridcolor: colors.grid, zerolinecolor: colors.line },
+                yaxis: { title: 'y', color: colors.text, gridcolor: colors.grid, zerolinecolor: colors.line },
                 annotations: rows.map(row => ({
                     x: row.x,
                     y: (row.y + row.yLine) / 2,
                     text: `Δ=${row.error.toFixed(2)}`,
                     showarrow: false,
-                    font: { size: 12, color: '#111' },
-                    bgcolor: 'rgba(255,255,255,0.7)'
+                    font: { size: 12, color: colors.text },
+                    bgcolor: colors.annotationBg
                 }))
             }, { responsive: true, displaylogo: false });
 

@@ -10,16 +10,16 @@
     <link rel="stylesheet" href="../assets/css/unified-demo.css?v=2">
     <style>
         .chart-container {
-            background: white;
+            background: var(--card-bg);
             border-radius: 10px;
             padding: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px var(--shadow);
             margin-bottom: 20px;
         }
 
         .chart-label {
             font-weight: bold;
-            color: #555;
+            color: var(--text-secondary);
             margin-bottom: 10px;
             display: block;
             font-size: 0.9rem;
@@ -38,22 +38,22 @@
 
         .metric-mini-card {
             flex: 1;
-            background: #f8f9fa;
+            background: var(--sidebar-bg);
             padding: 10px;
             border-radius: 6px;
             text-align: center;
-            border: 1px solid #eee;
+            border: 1px solid var(--border-color);
         }
 
         .m-val {
             font-weight: bold;
-            color: #333;
+            color: var(--text-primary);
             display: block;
         }
 
         .m-lab {
             font-size: 0.7rem;
-            color: #888;
+            color: var(--text-secondary);
             text-transform: uppercase;
         }
 
@@ -68,10 +68,13 @@
 <body>
     <div class="demo-wrapper">
         <div class="demo-header">
+            <button id="theme-toggle" class="theme-switch" aria-label="Toggle Theme">🌙</button>
             <a href="../index.html" class="back-link">← Kembali</a>
-            <h1>ROC & AUC Curve</h1>
-            <p>Memahami performa klasifikasi di berbagai ambang batas (Threshold)</p>
+            <h1>ROC and AUC</h1>
+            <p>Evaluasi model klasifikasi pada berbagai nilai threshold</p>
         </div>
+        <script src="../assets/js/utils.js"></script>
+        <script>initTheme();</script>
 
         <div class="demo-content">
             <div class="sidebar">
@@ -92,13 +95,13 @@
                 </div>
 
                 <div
-                    style="background: #fff0f6; border-left: 4px solid #e91e63; padding: 15px; border-radius: 5px; margin-top: 20px;">
-                    <h4 style="color: #c2185b; margin-bottom: 10px; font-size: 1em;">💡 Info</h4>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333;">
+                    style="background: var(--step-info-bg); border-left: 4px solid #e91e63; padding: 15px; border-radius: 5px; margin-top: 20px;">
+                    <h4 style="color: #e91e63; margin-bottom: 10px; font-size: 1em;">💡 Info</h4>
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary);">
                         <strong>TPR (True Positive Rate)</strong>: Sumbu Y pada kurva ROC. Seberapa banyak "Sakit" yang
                         terdeteksi benar.
                     </p>
-                    <p style="font-size: 0.85rem; line-height: 1.6; color: #333; margin-top: 8px;">
+                    <p style="font-size: 0.85rem; line-height: 1.6; color: var(--text-primary); margin-top: 8px;">
                         <strong>FPR (False Positive Rate)</strong>: Sumbu X pada kurva ROC. Seberapa banyak "Sehat" yang
                         dituduh "Sakit".
                     </p>
@@ -126,7 +129,8 @@
                         <span class="m-lab">FPR</span>
                         <span class="m-val" id="fprVal">0.00</span>
                     </div>
-                    <div class="metric-mini-card" style="flex: 1.5; background: #fff; border-color: #e91e63;">
+                    <div class="metric-mini-card"
+                        style="flex: 1.5; background: var(--bg-color); border-color: #e91e63;">
                         <span class="m-lab">Area Under Curve (AUC)</span>
                         <span class="auc-highlight" id="aucVal">0.00</span>
                     </div>

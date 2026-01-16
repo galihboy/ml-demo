@@ -1,3 +1,35 @@
+// Theme Management
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+}
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+        themeBtn.innerHTML = theme === 'light' ? '🌙' : '☀️';
+    }
+}
+
+// Tambahkan event listener saat DOM content dimuat
+document.addEventListener('DOMContentLoaded', () => {
+    initTheme();
+    const themeBtn = document.getElementById('theme-toggle');
+    if (themeBtn) {
+        themeBtn.addEventListener('click', toggleTheme);
+    }
+});
+
 // Utility functions untuk demo ML
 
 // Generate random data points
@@ -26,13 +58,13 @@ function normalize(data, min, max) {
 function drawAxes(ctx, width, height, padding = 40) {
     ctx.strokeStyle = '#333';
     ctx.lineWidth = 2;
-    
+
     // X-axis
     ctx.beginPath();
     ctx.moveTo(padding, height - padding);
     ctx.lineTo(width - padding, height - padding);
     ctx.stroke();
-    
+
     // Y-axis
     ctx.beginPath();
     ctx.moveTo(padding, padding);
